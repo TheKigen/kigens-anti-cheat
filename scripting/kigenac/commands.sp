@@ -93,6 +93,7 @@ Commands_OnAllPluginsLoaded()
 	// Exploitable needed commands.  Sigh....
 	RegConsoleCmd("ent_create", Commands_BlockEntExploit);
 	RegConsoleCmd("ent_fire", Commands_BlockEntExploit);
+	RegConsoleCmd("give", Commands_BlockEntExploit);
 
 	//- Blocked Commands -// Note: True sets them to ban, false does not.
 	SetTrieValue(g_hBlockedCmds, "ai_test_los", 			true);
@@ -263,7 +264,12 @@ public Action:Commands_BlockEntExploit(client, args)
 	  || StrContains(f_sCmd, "admin") != -1 		|| StrContains(f_sCmd, "ma_") != -1 
 	  || StrContains(f_sCmd, "rcon") != -1 			|| StrContains(f_sCmd, "sv_") != -1 
 	  || StrContains(f_sCmd, "mp_") != -1 			|| StrContains(f_sCmd, "meta") != -1 
-	  || StrContains(f_sCmd, "taketimer") != -1 )
+	  || StrContains(f_sCmd, "taketimer") != -1 		|| StrContains(f_sCmd, "logic_relay") != -1 
+	  || StrContains(f_sCmd, "logic_auto") != -1 		|| StrContains(f_sCmd, "logic_autosave") != -1 
+	  || StrContains(f_sCmd, "logic_branch") != -1 		|| StrContains(f_sCmd, "logic_case") != -1 
+	  || StrContains(f_sCmd, "logic_collision_pair") != -1  || StrContains(f_sCmd, "logic_compareto") != -1 
+	  || StrContains(f_sCmd, "logic_lineto") != -1 		|| StrContains(f_sCmd, "logic_measure_movement") != -1 
+	  || StrContains(f_sCmd, "logic_multicompare") != -1 	|| StrContains(f_sCmd, "logic_navigation") != -1 )
 	{
 		if ( g_bLogCmds )
 		{
