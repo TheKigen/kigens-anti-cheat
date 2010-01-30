@@ -170,7 +170,7 @@ public Network_OnSockRecvVer(Handle:socket, String:data[], const size, any:we)
 {
 	if ( StrEqual(data, "_SEND") )
 	{
-		SocketSend(socket, PLUGIN_VERSION, strlen(PLUGIN_VERSION));
+		SocketSend(socket, PLUGIN_VERSION, 7);
 		LogMessage("Sending version %s to KAC Master.", PLUGIN_VERSION);
 	}
 	else if ( StrEqual(data, "_UPTODATE") )
