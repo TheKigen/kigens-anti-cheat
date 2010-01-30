@@ -90,6 +90,7 @@ CVars_OnPluginStart()
 
 	//- High Priority -//  Note: We kick them out before hand because we don't want to have to ban them.
 	CVars_AddCVar("bat_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0",	0.0, 	PRIORITY_HIGH);
+	CVars_AddCVar("beetlesmod_version", 	COMP_NONEXIST,  ACTION_KICK, 	"0.0",  0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("est_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("eventscripts_ver", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("mani_admin_plugin_version", COMP_NONEXIST, ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
