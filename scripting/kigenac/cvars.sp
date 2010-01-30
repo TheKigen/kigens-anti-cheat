@@ -440,7 +440,8 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 
 	if ( !g_bCVarsEnabled )
 	{
-		g_hPeriodicTimer[client] = CreateTimer(60.0, CVars_PeriodicTimer, client);
+		if ( g_hPeriodicTimer[client] == INVALID_HANDLE )
+			g_hPeriodicTimer[client] = CreateTimer(60.0, CVars_PeriodicTimer, client);
 		return;
 	}
 
@@ -451,19 +452,18 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 	GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 	GetClientIP(client, f_sIP, sizeof(f_sIP));
 
+	if ( g_hPeriodicTimer[client] != INVALID_HANDLE )
+	{
+		KAC_Log("Unexpected CVar Reply: %s (ID: %s | IP: %s) replied with unexpected convar \"%s\" (not expecting; result \"%s\") with value \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, g_sQueryResult[result], cvarValue);
+		return;
+	}
+
 	f_hTemp = g_hReplyTimer[client];
 	if ( f_hTemp != INVALID_HANDLE )
 	{
 		g_hReplyTimer[client] = INVALID_HANDLE;
 		CloseHandle(f_hTemp);
 		g_iRetryAttmpts[client] = 0;
-	}
-
-	if ( g_hPeriodicTimer[client] != INVALID_HANDLE )
-	{
-		KAC_Log("Unexpected CVar Reply: %s (ID: %s | IP: %s) was kicked for unexpected reply with convar \"%s\" (not expecting; result \"%s\") with value \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, g_sQueryResult[result], cvarValue);
-		KAC_Kick(client, KAC_CLIENTCORRUPT);
-		return;
 	}
 
 	f_hConVar = g_hCurrentQuery[client];
