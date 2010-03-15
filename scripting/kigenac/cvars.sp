@@ -863,6 +863,7 @@ stock bool:CVars_RemoveCVar(String:f_sName[])
 
 	RemoveFromArray(g_hCVars, f_iIndex);
 	RemoveFromTrie(g_hCVarIndex, f_sName);
+	CloseHandle(f_hConVar);
 	g_iSize = GetArraySize(g_hCVars);
 	return true;
 }
