@@ -923,6 +923,10 @@ CVars_CreateNewOrder()
 
 	for(new i=0;i<g_iSize;i++)
 		PushArrayCell(g_hCVars, f_hOrder[i]);
+
+	CloseHandle(f_hPHigh);
+	CloseHandle(f_hPMedium);
+	CloseHandle(f_hPNormal);
 }
 
 CVars_ReplicateConVar(Handle:f_hConVar)
