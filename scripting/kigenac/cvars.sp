@@ -94,9 +94,11 @@ CVars_OnPluginStart()
 	CVars_AddCVar("est_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("eventscripts_ver", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("mani_admin_plugin_version", COMP_NONEXIST, ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
+	CVars_AddCVar("ManiAdminTakeOver",	COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("metamod_version", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("openscript",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("openscript_version",	COMP_NONEXIST,	ACTION_BAN, 	"0.0",	0.0,	PRIORITY_HIGH);
+	CVars_AddCVar("SmAdminTakeover", 	COMP_NONEXIST, 	ACTION_BAN,	"0.0", 	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("sourcemod_version", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("zb_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 
