@@ -225,12 +225,6 @@ public Action:CVars_CmdAddCVar(client, args)
 			return Plugin_Handled;
 		}
 
-	if ( GetTrieValue(g_hCVarIndex, f_sCVarName, f_iAction) )
-	{
-		KAC_ReplyToCommand(client, KAC_ADDCVAREXISTS, f_sCVarName);
-		return Plugin_Handled;
-	}
-
 	GetCmdArg(2, f_sTemp, sizeof(f_sTemp));
 
 	if ( StrEqual(f_sTemp, "=") || StrEqual(f_sTemp, "equal") )
@@ -811,40 +805,51 @@ bool:CVars_AddCVar(String:f_sName[], f_iComparisonType, f_iAction, const String:
 			return false;
 		}
 
-	if ( GetTrieValue(g_hCVarIndex, f_sName, f_hConVar) ) // Check if CVar check already exists.
-	{
-		KAC_Log("ConVar already exists in list %s.", f_sName);
-		return false;
-	}
-
 	f_hConVar = FindConVar(f_sName);
 	if ( f_hConVar != INVALID_HANDLE && (GetConVarFlags(f_hConVar) & FCVAR_REPLICATED) && ( f_iComparisonType == COMP_EQUAL || f_iComparisonType == COMP_STRING ) )
 		f_iComparisonType = COMP_EQUAL;
 	else
 		f_hConVar = INVALID_HANDLE;
 
-	f_hArray = CreateArray(64);
-	PushArrayString(f_hArray, f_sName);		// Name			0
-	PushArrayCell(f_hArray, f_iComparisonType);	// Comparison Type	1
-	PushArrayCell(f_hArray, f_hConVar);		// CVar Handle		2
-	PushArrayCell(f_hArray, f_iAction);		// Action Type		3
-	PushArrayString(f_hArray, f_sValue);		// Value		4
-	PushArrayCell(f_hArray, f_fValue2);		// Value2		5
-	PushArrayString(f_hArray, f_sAlternative);	// Alternative Info	6
-	PushArrayCell(f_hArray, f_iImportance);		// Importance		7
-	PushArrayCell(f_hArray, INVALID_HANDLE);	// Changed		8
-
-	if ( !SetTrieValue(g_hCVarIndex, f_sName, f_hArray) )
+	if ( GetTrieValue(g_hCVarIndex, f_sName, f_hArray) ) // Check if CVar check already exists.
 	{
-		CloseHandle(f_hArray);
-		KAC_Log("Unable to add convar to Trie link list %s.", f_sName);
-		return false;
+		SetArrayString(f_hArray, CELL_NAME, f_sName);			// Name			0
+		SetArrayCell(f_hArray, CELL_COMPTYPE, f_iComparisonType);	// Comparison Type	1
+		SetArrayCell(f_hArray, CELL_HANDLE, f_hConVar);			// CVar Handle		2
+		SetArrayCell(f_hArray, CELL_ACTION, f_iAction);			// Action Type		3
+		SetArrayString(f_hArray, CELL_VALUE, f_sValue);			// Value		4
+		SetArrayCell(f_hArray, CELL_VALUE2, f_fValue2);			// Value2		5
+		SetArrayString(f_hArray, CELL_ALT, f_sAlternative);		// Alternative Info	6
+		// We will not change the priority.
+		// Nor will we change the "changed" cell either.
 	}
-	PushArrayCell(g_hCVars, f_hArray);
-	g_iSize = GetArraySize(g_hCVars);
+	else
+	{
+		f_hArray = CreateArray(64);
+		PushArrayString(f_hArray, f_sName);		// Name			0
+		PushArrayCell(f_hArray, f_iComparisonType);	// Comparison Type	1
+		PushArrayCell(f_hArray, f_hConVar);		// CVar Handle		2
+		PushArrayCell(f_hArray, f_iAction);		// Action Type		3
+		PushArrayString(f_hArray, f_sValue);		// Value		4
+		PushArrayCell(f_hArray, f_fValue2);		// Value2		5
+		PushArrayString(f_hArray, f_sAlternative);	// Alternative Info	6
+		PushArrayCell(f_hArray, f_iImportance);		// Importance		7
+		PushArrayCell(f_hArray, INVALID_HANDLE);	// Changed		8
 
-	if ( f_iImportance != PRIORITY_NORMAL && g_bMapStarted )
-		CVars_CreateNewOrder();
+		if ( !SetTrieValue(g_hCVarIndex, f_sName, f_hArray) )
+		{
+			CloseHandle(f_hArray);
+			KAC_Log("Unable to add convar to Trie link list %s.", f_sName);
+			return false;
+		}
+
+		PushArrayCell(g_hCVars, f_hArray);
+		g_iSize = GetArraySize(g_hCVars);
+
+		if ( f_iImportance != PRIORITY_NORMAL && g_bMapStarted )
+			CVars_CreateNewOrder();
+
+	}
 
 	return true;
 }
