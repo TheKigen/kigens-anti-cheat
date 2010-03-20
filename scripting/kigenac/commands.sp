@@ -159,7 +159,7 @@ Commands_OnAllPluginsLoaded()
 		{
 			if ( !f_bIsCommand || StrEqual(f_sName, "sm") )
 				continue;
-			if ( StrEqual(f_sName, "buy") || StrEqual(f_sName, "use") || StrContains(f_sName, "es_") != -1 )
+			if ( StrEqual(f_sName, "buy") || StrEqual(f_sName, "use") || ( StrContains(f_sName, "es_") != -1 && || !StrEqual(command, "es_version") ) )
 				RegConsoleCmd(f_sName, Commands_ClientCheck);
 			else
 				RegConsoleCmd(f_sName, Commands_SpamCheck);
@@ -315,7 +315,7 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 		LogToFileEx(g_sCmdLogPath, "%L used command: %s %s", client, command, f_sCmdString);
 	}
 
-	if ( g_iCmdSpam != 0 && !StrEqual(command, "buy") && !StrEqual(command, "use") && !StrEqual(command, "buyammo1") && !StrEqual(command, "buyammo2") && StrContains(command, "es_") == -1 && g_iCmdCount[client]++ > g_iCmdSpam )
+	if ( g_iCmdSpam != 0 && !StrEqual(command, "buy") && !StrEqual(command, "use") && !StrEqual(command, "buyammo1") && !StrEqual(command, "buyammo2") && ( StrContains(command, "es_") == -1 || StrEqual(command, "es_version") ) && g_iCmdCount[client]++ > g_iCmdSpam )
 	{
 		decl String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
 		GetClientName(client, f_sName, sizeof(f_sName));
