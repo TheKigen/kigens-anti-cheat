@@ -214,13 +214,15 @@ public OnMapStart()
 {
 	g_bMapStarted = true;
 	CVars_CreateNewOrder();
-	Client_OnMap()
+	Client_OnMap();
+	RCON_OnMap();
 }
 
 public OnMapEnd()
 {
 	g_bMapStarted = false;
-	Client_OnMap()
+	Client_OnMap();
+	RCON_OnMap();
 }
 
 //- Client Functions -//
