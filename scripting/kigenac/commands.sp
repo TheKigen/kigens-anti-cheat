@@ -159,7 +159,7 @@ Commands_OnAllPluginsLoaded()
 		{
 			if ( !f_bIsCommand || StrEqual(f_sName, "sm") )
 				continue;
-			if ( StrEqual(f_sName, "buy") || StrEqual(f_sName, "use") || ( StrContains(f_sName, "es_") != -1 && || !StrEqual(command, "es_version") ) )
+			if ( StrEqual(f_sName, "buy") || StrEqual(f_sName, "use") || ( StrContains(f_sName, "es_") != -1 && !StrEqual(f_sName, "es_version") ) )
 				RegConsoleCmd(f_sName, Commands_ClientCheck);
 			else
 				RegConsoleCmd(f_sName, Commands_SpamCheck);
