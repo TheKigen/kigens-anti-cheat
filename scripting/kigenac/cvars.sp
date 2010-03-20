@@ -524,7 +524,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				case ACTION_BAN:
 				{
 					KAC_Log("Bad CVar return: %s (ID: %s | IP: %s) has convar \"%s\" (value \"%s\", return %s) when it shouldn't exist.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
-					KAC_Ban(client, 0, KAC_BANNED, "KAC: %s violation (shouldn't exist)", cvarName);
+					KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
 					Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) had convar \"%s\" set to \"%s\" (return %s) when it shouldn't exist.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
 #endif
