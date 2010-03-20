@@ -95,7 +95,8 @@ CVars_OnPluginStart()
 	CVars_AddCVar("eventscripts_ver", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("mani_admin_plugin_version", COMP_NONEXIST, ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("metamod_version", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
-	CVars_AddCVar("openscript_version",	COMP_NONEXIST,	ACTION_KICK, 	"0.0",	0.0,	PRIORITY_HIGH);
+	CVars_AddCVar("openscript",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
+	CVars_AddCVar("openscript_version",	COMP_NONEXIST,	ACTION_BAN, 	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("sourcemod_version", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("zb_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 
@@ -473,7 +474,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 	// We weren't expecting a reply or convar we queried is no longer valid or was changed.
 	if ( f_hConVar == INVALID_HANDLE )
 	{
-		g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(1.0, 3.0), CVars_PeriodicTimer, client);
+		g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(0.5, 2.0), CVars_PeriodicTimer, client);
 		return;
 	}
 
@@ -764,7 +765,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 			}
 	}
 	
-	g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(1.0, 3.0), CVars_PeriodicTimer, client);
+	g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(0.5, 2.0), CVars_PeriodicTimer, client);
 	
 }
 
