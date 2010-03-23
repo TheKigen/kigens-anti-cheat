@@ -268,7 +268,7 @@ bool:Client_OnClientConnect(client, String:rejectmsg[], size)
 
 		f_iSize = strlen(f_sName);
 
-		if ( f_iSize < 1 )
+		if ( f_iSize < 1 || f_sName[0] == '&' )
 		{
 			Format(rejectmsg, size, "Please change your name");
 			return false;
@@ -323,6 +323,12 @@ public OnClientSettingsChanged(client)
 	{
 		KAC_Log("%s (ID: %s | IP: %s) was banned for name hack (unconnected).", f_sName, f_sAuthID, f_sIP);
 		KAC_Ban(client, 0, KAC_BANNED, "KAC: Name hack (unconnected)");
+		return;
+	}
+
+	if ( f_sName[0] == '&' )
+	{
+		KAC_Kick(client, KAC_CHANGENAME);
 		return;
 	}
 
