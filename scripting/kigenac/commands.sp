@@ -141,6 +141,7 @@ Commands_OnAllPluginsLoaded()
 	SetTrieValue(g_hBlockedCmds, "report_entities", 		true);
 	SetTrieValue(g_hBlockedCmds, "report_touchlinks", 		true);
 	SetTrieValue(g_hBlockedCmds, "report_simthinklist", 		true);
+	SetTrieValue(g_hBlockedCmds, "respawn_entities",		true);
 	SetTrieValue(g_hBlockedCmds, "rr_reloadresponsesystems", 	true);
 	SetTrieValue(g_hBlockedCmds, "wc_update_entity", 		false);
 
