@@ -82,6 +82,8 @@ Commands_OnPluginStart()
 
 	RegConsoleCmd("say", Commands_FilterSay);
 	RegConsoleCmd("say_team", Commands_FilterSay);
+
+	HookEventEx("player_disconnect", Commands_EventDisconnect, EventHookMode_Pre)
 }
 
 Commands_OnAllPluginsLoaded()
@@ -177,6 +179,65 @@ Commands_OnPluginEnd()
 {
 	if ( g_hCountReset != INVALID_HANDLE )
 		CloseHandle(g_hCountReset);
+}
+
+//- Events -//
+
+public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	decl String:f_sReason[512], String:f_sTemp[512], f_iLength, client, String:f_sIP[64];
+	client = GetClientOfUserId(GetEventInt(event, "userid"));
+	GetEventString(event, "reason", f_sReason, sizeof(f_sReason));
+	GetEventString(event, "name", f_sTemp, sizeof(f_sTemp));
+	f_iLength = strlen(f_sReason)+strlen(f_sTemp);
+	GetEventString(event, "networkid", f_sTemp, sizeof(f_sTemp));
+	f_iLength += strlen(f_sTemp);
+	if ( f_iLength > 254 )
+	{
+		KAC_Log("Bad disconnect reason, length %d, \"%s\"", f_iLength, f_sReason);
+		if ( client )
+		{
+			GetClientIP(client, f_sIP, sizeof(f_sIP));
+			KAC_Log("%L<%s> submitted a bad disconnect and was banned.", client, f_sIP);
+			BanIdentity(f_sIP, 10080, BANFLAG_IP, "KAC: Disconnect exploit."); // Prevent them from rejoining.
+			if ( GetClientAuthString(client, f_sTemp, sizeof(f_sTemp)) )
+			{
+				if ( g_bSourceBans ) // Prevent them from ever playing on these servers again.
+					ServerCommand("sm_addban 0 \"%s\" KAC: Disconnect exploit.", f_sTemp);
+				else
+					BanIdentity(f_sTemp, 0, BANFLAG_AUTHID, "KAC: Disconnect exploit.", "KAC");
+#if defined PRIVATE
+				Private_Ban(f_sTemp, "%N (ID: %s | IP: %s) was banned for disconnect exploit. Length: %d", client, f_sTemp, f_sIP, f_iLength);
+#endif
+			}
+		}
+		SetEventBroadcast(event, true);
+		return Plugin_Continue;
+	}
+	f_iLength = strlen(f_sReason);
+	for(new i=0;i<f_iLength;i++)
+	{
+		if ( f_sReason[i] < 32 )
+		{
+			SetEventBroadcast(event, true);
+			if ( f_sReason[i] != '\n' )
+			{
+				KAC_Log("Bad disconnect reason, \"%s\" len = %d", f_sReason, f_iLength);
+				if ( client )
+				{
+					GetClientIP(client, f_sIP, sizeof(f_sIP));
+					KAC_Log("%L<%s> submitted a bad disconnect.  Possible corruption or attack.", client, f_sIP);
+#if defined PRIVATE
+					if ( GetClientAuthString(client, f_sTemp, sizeof(f_sTemp)) )
+						Private_Ban(f_sTemp, "%N (ID: %s | IP: %s) was banned for disconnect exploit. C0 Length: %d", client, f_sTemp, f_sIP, f_iLength);
+#endif
+					
+				}
+				return Plugin_Continue;
+			}
+		}
+	}
+	return Plugin_Continue;
 }
 
 //- Admin Commnads -//
