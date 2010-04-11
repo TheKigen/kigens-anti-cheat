@@ -89,6 +89,7 @@ CVars_OnPluginStart()
 	g_hCVarIndex = CreateTrie();
 
 	//- High Priority -//  Note: We kick them out before hand because we don't want to have to ban them.
+	CVars_AddCVar("0penscript",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("bat_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0",	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("beetlesmod_version", 	COMP_NONEXIST,  ACTION_KICK, 	"0.0",  0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("est_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
@@ -96,6 +97,7 @@ CVars_OnPluginStart()
 	CVars_AddCVar("lua_open",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("Lua-Engine",		COMP_NONEXIST, 	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("mani_admin_plugin_version", COMP_NONEXIST, ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
+	CVars_AddCVar("ManiAdminHacker",	COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("ManiAdminTakeOver",	COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("metamod_version", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("openscript",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
@@ -128,7 +130,9 @@ CVars_OnPluginStart()
 	CVars_AddCVar("host_timescale", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("mat_dxlevel", 		COMP_GREATER, 	ACTION_KICK, 	"80.0", 0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("mat_fillrate", 		COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
+	CVars_AddCVar("mat_measurefillrate",	COMP_EQUAL,	ACTION_BAN,	"0.0", 	0.0,	PRIORITY_NORMAL);
 	CVars_AddCVar("mat_proxy", 		COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
+	CVars_AddCVar("mat_showlowresimage",	COMP_EQUAL, 	ACTION_BAN,	"0.0",	0.0,	PRIORITY_NORMAL);
 	CVars_AddCVar("mat_wireframe", 		COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("mem_force_flush", 	COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("snd_show", 		COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
@@ -141,6 +145,7 @@ CVars_OnPluginStart()
 	CVars_AddCVar("r_drawclipbrushes", 	COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("r_drawdecals", 		COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("r_drawentities", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
+	CVars_AddCVar("r_drawmodelstatsoverlay",COMP_EQUAL,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_NORMAL);
 	CVars_AddCVar("r_drawopaqueworld", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("r_drawparticles", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("r_drawrenderboxes", 	COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
@@ -215,18 +220,9 @@ public Action:CVars_CmdAddCVar(client, args)
 		return Plugin_Handled;
 	}
 
-	decl String:f_sCVarName[64], String:f_sTemp[64], f_iCompType, f_iAction, String:f_sValue[64], Float:f_fValue2, String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], f_iLen;
+	decl String:f_sCVarName[64], String:f_sTemp[64], f_iCompType, f_iAction, String:f_sValue[64], Float:f_fValue2, String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64];
 
 	GetCmdArg(1, f_sCVarName, sizeof(f_sCVarName));
-
-	f_iLen = strlen(f_sCVarName);
-
-	for(new i=0;i<f_iLen;i++)
-		if ( !IsValidConVarChar(f_sCVarName[i]) )
-		{
-			KAC_ReplyToCommand(client, KAC_ADDCVARBADNAME, f_sCVarName);
-			return Plugin_Handled;
-		}
 
 	GetCmdArg(2, f_sTemp, sizeof(f_sTemp));
 
@@ -799,14 +795,7 @@ public CVars_EnableChange(Handle:convar, const String:oldValue[], const String:n
 
 bool:CVars_AddCVar(String:f_sName[], f_iComparisonType, f_iAction, const String:f_sValue[], Float:f_fValue2, f_iImportance, const String:f_sAlternative[] = "")
 {
-	new f_iNameSize = strlen(f_sName), Handle:f_hConVar = INVALID_HANDLE, Handle:f_hArray;
-
-	for(new i=0;i<f_iNameSize;i++)
-		if ( !IsValidConVarChar(f_sName[i]) )
-		{
-			KAC_Log("ConVar name %s has invalid ConVar character at %d.", f_sName, i);
-			return false;
-		}
+	new Handle:f_hConVar = INVALID_HANDLE, Handle:f_hArray;
 
 	f_hConVar = FindConVar(f_sName);
 	if ( f_hConVar != INVALID_HANDLE && (GetConVarFlags(f_hConVar) & FCVAR_REPLICATED) && ( f_iComparisonType == COMP_EQUAL || f_iComparisonType == COMP_STRING ) )
