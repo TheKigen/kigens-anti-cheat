@@ -211,15 +211,19 @@ public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:d
 #endif
 			}
 		}
-		SetEventBroadcast(event, true);
-		return Plugin_Continue;
+		if ( g_bIsNewSM )
+		{
+			SetEventBroadcast(event, true);
+			return Plugin_Continue;
+		}
+		else
+			return Plugin_Stop;
 	}
 	f_iLength = strlen(f_sReason);
 	for(new i=0;i<f_iLength;i++)
 	{
 		if ( f_sReason[i] < 32 )
 		{
-			SetEventBroadcast(event, true);
 			if ( f_sReason[i] != '\n' )
 			{
 				KAC_Log("Bad disconnect reason, \"%s\" len = %d", f_sReason, f_iLength);
@@ -233,7 +237,13 @@ public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:d
 #endif
 					
 				}
-				return Plugin_Continue;
+				if ( g_bIsNewSM )
+				{
+					SetEventBroadcast(event, true);
+					return Plugin_Continue;
+				}
+				else
+					return Plugin_Stop;
 			}
 		}
 	}
