@@ -81,6 +81,7 @@ public bool:AskPluginLoad(Handle:myself, bool:late, String:error[], err_max)
 	MarkNativeAsOptional("SBBanPlayer");
 	MarkNativeAsOptional("SDKHook");
 	MarkNativeAsOptional("SDKUnhook");
+	MarkNativeAsOptional("SetEventBroadcast");
 	return true;
 }
 
@@ -90,6 +91,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 	MarkNativeAsOptional("SBBanPlayer");
 	MarkNativeAsOptional("SDKHook");
 	MarkNativeAsOptional("SDKUnhook");
+	MarkNativeAsOptional("SetEventBroadcast");
 	return APLRes_Success;
 }
 
