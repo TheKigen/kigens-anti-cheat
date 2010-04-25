@@ -35,6 +35,7 @@ new g_iClientNameProtectStatus;
 new Handle:g_hClientSpawned = INVALID_HANDLE;
 new g_iClientClass[MAXPLAYERS+1] = {-1, ...};
 new String:g_sClientConnections[MAX_CONNECTIONS][64];
+new bool:g_bClientMapStarted = false;
 
 //- Plugin Functions -//
 
@@ -60,7 +61,7 @@ Client_OnPluginStart()
 
 		HookEvent("player_spawn", Client_PlayerSpawn);
 		HookEvent("player_death", Client_PlayerDeath);
-		HookEvent("round_start", Client_CleanEvent);
+		HookEvent("round_start", Client_RoundStart);
 		HookEvent("round_end", Client_CleanEvent);
 
 		RegConsoleCmd("joinclass", Client_JoinClass);
@@ -116,7 +117,7 @@ Client_OnPluginEnd()
 
 public Action:Client_JoinClass(client, args)
 {
-	if ( !g_bClientEnable || !g_bClientAntiRespawn || !client || IsFakeClient(client) || GetClientTeam(client) < 2 )
+	if ( !g_bClientEnable || !g_bClientAntiRespawn || !g_bClientMapStarted || !client || IsFakeClient(client) || GetClientTeam(client) < 2 )
 		return Plugin_Continue;
 
 	new String:f_sAuthID[64], String:f_sTemp[64], f_iTemp;
@@ -165,9 +166,15 @@ public Action:Client_Autobuy(client, args)
 }
 
 //- Map -//
-
-Client_OnMap()
+Client_OnMapStart()
 {
+	
+}
+
+Client_OnMapEnd()
+{
+	g_bClientMapStarted = false;
+
 	for(new i=0;i<MAX_CONNECTIONS;i++)
 		strcopy(g_sClientConnections[i], 64, "");
 
@@ -212,6 +219,11 @@ public Action:Client_PlayerDeath(Handle:event, const String:name[], bool:dontBro
 	SetTrieValue(g_hClientSpawned, f_sAuthID, true);
 
 	return Plugin_Continue
+}
+
+public Action:Client_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
+{
+		g_bClientMapStarted = true;
 }
 
 public Action:Client_CleanEvent(Handle:event, const String:name[], bool:dontBroadcast)
