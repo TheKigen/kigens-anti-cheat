@@ -79,18 +79,18 @@ public RCON_CrashPrevent(Handle:convar, const String:oldValue[], const String:ne
 		if ( f_hConVar != INVALID_HANDLE )
 		{
 			g_iMinFail =  GetConVarInt(f_hConVar);
-			SetConVarBounds(f_hConVar, ConVarBound_Upper, true, 99999.0);
-			SetConVarBounds(f_hConVar, ConVarBound_Lower, true, 99999.0);
-			SetConVarInt(f_hConVar, 99999);
+			SetConVarBounds(f_hConVar, ConVarBound_Upper, true, 9999999.0);
+			SetConVarBounds(f_hConVar, ConVarBound_Lower, true, 9999999.0);
+			SetConVarInt(f_hConVar, 9999999);
 		}
 	
 		f_hConVar = FindConVar("sv_rcon_maxfailures");
 		if ( f_hConVar != INVALID_HANDLE )
 		{
 			g_iMaxFail = GetConVarInt(f_hConVar);
-			SetConVarBounds(f_hConVar, ConVarBound_Upper, true, 99999.0);
-			SetConVarBounds(f_hConVar, ConVarBound_Lower, true, 99999.0);
-			SetConVarInt(f_hConVar, 99999);
+			SetConVarBounds(f_hConVar, ConVarBound_Upper, true, 9999999.0);
+			SetConVarBounds(f_hConVar, ConVarBound_Lower, true, 9999999.0);
+			SetConVarInt(f_hConVar, 9999999);
 		}
 		g_bRCONPreventEnabled = true;
 		Status_Report(g_iRCONStatus, KAC_ON);
