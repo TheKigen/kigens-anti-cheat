@@ -82,6 +82,7 @@ Commands_OnPluginStart()
 
 	RegConsoleCmd("say", Commands_FilterSay);
 	RegConsoleCmd("say_team", Commands_FilterSay);
+	RegConsoleCmd("sm_menu", Commands_BlockExploit);
 
 	HookEventEx("player_disconnect", Commands_EventDisconnect, EventHookMode_Pre)
 }
@@ -192,7 +193,7 @@ public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:d
 	f_iLength = strlen(f_sReason)+strlen(f_sTemp);
 	GetEventString(event, "networkid", f_sTemp, sizeof(f_sTemp));
 	f_iLength += strlen(f_sTemp);
-	if ( f_iLength > 254 )
+	if ( f_iLength > 235 )
 	{
 		KAC_Log("Bad disconnect reason, length %d, \"%s\"", f_iLength, f_sReason);
 		if ( client )
@@ -250,7 +251,7 @@ public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:d
 	return Plugin_Continue;
 }
 
-//- Admin Commnads -//
+//- Admin Commands -//
 
 public Action:Commands_AddCmd(client, args)
 {
@@ -295,6 +296,27 @@ public Action:Commands_RemoveCmd(client, args)
 }
 
 //- Console Commands -//
+
+public Action:Commands_BlockExploit(client, args)
+{
+	if ( args > 0 )
+	{
+		decl String:f_sArg[64];
+		GetCmdArg(1, f_sArg, sizeof(f_sArg));
+		if ( StrEqual(f_sArg, "rcon_password") )
+		{
+			new String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
+			GetClientName(client, f_sName, sizeof(f_sName));
+			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
+			GetClientIP(client, f_sIP, sizeof(f_sIP));
+			GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
+			KAC_Log("%s (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", f_sName, f_sAuthID, f_sIP, command, f_sCmdString);
+			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Command %s violation", command);
+			return Plugin_Stop;
+		}
+	}
+	return Plugin_Continue;
+}
 
 public Action:Commands_FilterSay(client, args)
 {
