@@ -78,6 +78,9 @@ public Action:Network_Checked(client, args)
 		if ( g_bInGame[i] && GetClientName(i, f_sName, sizeof(f_sName)) && GetClientAuthString(i, f_sAuthID, sizeof(f_sAuthID)) )
 			ReplyToCommand(client, "%s (%s): %s", f_sName, f_sAuthID, (g_bChecked[i]) ? "Checked" : "Waiting");
 
+	if ( !g_bIsNewSM )
+		ReplyToCommand(client, "Your SourceMod version is out of date.  Please update SourceMod to 1.3 or later.");
+
 	return Plugin_Handled;
 }
 
@@ -99,7 +102,7 @@ public Action:Network_Timer(Handle:timer, any:we)
 		CloseHandle(f_hTemp);
 	}
 
-	if ( !g_bVCheckDone )
+	if ( !g_bVCheckDone ) // If SourceMod is older than 1.3 we will not update.  But we will still check clients.
 	{
 		g_iInError = 12; // Wait 30 seconds.
 		g_hSocket = SocketCreate(SOCKET_TCP, Network_OnSockErrVer);
@@ -126,6 +129,12 @@ public Action:Network_VTimer(Handle:timer, any:we)
 {
 	g_bVCheckDone = false;
 	return Plugin_Stop;
+}
+
+public Action:Network_Reminder(Handle:timer, any:we)
+{
+	KAC_PrintToChatAdmins(KAC_SMOUTOFDATE);
+	return Plugin_Continue;
 }
 
 //- Socket Functions -//
@@ -183,10 +192,20 @@ public Network_OnSockRecvVer(Handle:socket, String:data[], const size, any:we)
 	}
 	else if ( StrContains(data, "_UPDATING") != -1 )
 	{
-		g_iInError = 9999;
 		if ( SocketIsConnected(socket) )
 			SocketDisconnect(socket);
+
+		if ( !g_bIsNewSM )
+		{
+			g_bVCheckDone = true;
+			KAC_PrintToChatAdmins(KAC_SMOUTOFDATE);
+			LogMessage("SourceMod is out of date.  Please update SourceMod to get the latest version of KAC.");
+			CreateTimer(120.0, Network_Reminder, _, TIMER_REPEAT);
+			return;
+		}
+
 		new String:path[256], String:f_sTemp[64];
+		g_iInError = 9999;
 		LogMessage("Received that KAC is out of date, updating to newest version.");
 		Format(UpdatePath, sizeof(UpdatePath), "%s", data[10]);
 		GetPluginFilename(GetMyHandle(), f_sTemp, sizeof(f_sTemp));

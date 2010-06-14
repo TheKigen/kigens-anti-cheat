@@ -80,6 +80,7 @@
 #define KAC_CLIENTNAMEPROTECT "KAC_CLIENTNAMEPROTECT"
 #define KAC_AUTOASSIGNED "KAC_AUTOASSIGNED"
 #define KAC_SAYBLOCK "KAC_SAYBLOCK"
+#define KAC_SMOUTOFDATE "KAC_SMOUTOFDATE"
 
 new Handle:g_hLanguages = INVALID_HANDLE;
 
@@ -158,6 +159,7 @@ Trans_OnPluginStart()
 	SetTrieString(f_hTemp, KAC_CLIENTNAMEPROTECT, 	"Client Name Protection");
 	SetTrieString(f_hTemp, KAC_AUTOASSIGNED, 	"[KAC] You have been Auto-Assigned to a team.");
 	SetTrieString(f_hTemp, KAC_SAYBLOCK, 		"[KAC] Your say has been blocked due to a invalid character.");
+	SetTrieString(f_hTemp, KAC_SMOUTOFDATE,		"[KAC] Your SourceMod is out of date.  Please update SourceMod to get the latest KAC version.");
 
 	//- Dutch -//
 /*	if ( !GetTrieValue(g_hLanguages, "nl", any:f_hTemp) || f_hTemp == INVALID_HANDLE )
