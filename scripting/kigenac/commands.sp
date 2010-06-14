@@ -311,7 +311,7 @@ public Action:Commands_BlockExploit(client, args)
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
 			GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
 			KAC_Log("%s (ID: %s | IP: %s) was banned for command usage violation of command: sm_menu %s", f_sName, f_sAuthID, f_sIP, f_sCmdString);
-			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Command %s violation", command);
+			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Exploit violation");
 			return Plugin_Stop;
 		}
 	}
