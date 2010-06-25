@@ -19,7 +19,7 @@
 */
 
 //- Pre-processor Defines -//
-#define PLUGIN_VERSION "1.2.1.1"
+#define PLUGIN_VERSION "1.2.1.2"
 #define PLUGIN_BUILD 1
 
 #define GAME_OTHER	0
