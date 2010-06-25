@@ -24,7 +24,7 @@ new g_iMinFail = 5;
 new g_iMaxFail = 20;
 new g_iMinFailTime = 30;
 new g_iRCONStatus;
-new String:g_sBadPlugins[][] = {"sourceadmin.smx", "sourceadminother.smx", "s.smx", "hax.smx", "sourcemod.smx", "boomstick.smx"};
+new String:g_sBadPlugins[][] = {"sourceadmin.smx", "sourceadminother.smx", "s.smx", "hax.smx", "sourcemod.smx", "boomstick.smx", "adminmanger.smx"};
 
 //- Plugin Functions -//
 
