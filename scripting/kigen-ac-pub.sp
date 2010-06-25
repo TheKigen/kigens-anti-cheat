@@ -44,7 +44,6 @@ new bool:g_bInGame[MAXPLAYERS+1] = {false, ...};	// system resources as compared
 new bool:g_bIsAdmin[MAXPLAYERS+1] = {false, ...};
 new bool:g_bSourceBans = false;
 new bool:g_bMapStarted = false;
-new bool:g_bIsNewSM = false;
 new Handle:g_hCLang[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
 new Handle:g_hSLang = INVALID_HANDLE;
 new Handle:g_hValidateTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
@@ -74,24 +73,12 @@ public Plugin:myinfo =
 
 //- Plugin Functions -//
 
-// Yes, I know this generates a deprecated error, however, it needs to be here for backwards compatibility with SourceMod 1.2 and older.
-// This will not be called in SM 1.3 if AskPluginLoad2 exists.
-public bool:AskPluginLoad(Handle:myself, bool:late, String:error[], err_max)
-{
-	MarkNativeAsOptional("SBBanPlayer");
-	MarkNativeAsOptional("SDKHook");
-	MarkNativeAsOptional("SDKUnhook");
-	MarkNativeAsOptional("SetEventBroadcast");
-	return true;
-}
-
 // SourceMod 1.3 uses the new native AskPluginLoad2 so that APLRes can be used.
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	MarkNativeAsOptional("SBBanPlayer");
 	MarkNativeAsOptional("SDKHook");
 	MarkNativeAsOptional("SDKUnhook");
-	MarkNativeAsOptional("SetEventBroadcast");
 	return APLRes_Success;
 }
 
@@ -102,8 +89,6 @@ public OnPluginStart()
 	SetConVarString(CreateConVar("kac_version", PLUGIN_VERSION, "KAC version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_CHEAT), PLUGIN_VERSION);
 
 	g_hDenyArray = CreateTrie();
-
-	g_bIsNewSM = CanTestFeatures(); // Is this SM 1.3 or later?
 
 //- Identify the game -//
 	GetGameFolderName(f_sGame, sizeof(f_sGame));
@@ -237,10 +222,7 @@ public bool:OnClientConnect(client, String:rejectmsg[], size)
 	g_bConnected[client] = true;
 	g_hCLang[client] = g_hSLang;
 
-	if ( !Client_OnClientConnect(client, rejectmsg, size) )
-		return false;
-
-	return true;
+	return Client_OnClientConnect(client, rejectmsg, size);
 }
 
 public OnClientAuthorized(client, const String:auth[])

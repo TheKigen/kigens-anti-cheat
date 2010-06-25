@@ -99,53 +99,54 @@ Commands_OnAllPluginsLoaded()
 	RegConsoleCmd("give", Commands_BlockEntExploit);
 
 	//- Blocked Commands -// Note: True sets them to ban, false does not.
-	SetTrieValue(g_hBlockedCmds, "ai_test_los", 			true);
+	SetTrieValue(g_hBlockedCmds, "ai_test_los", 			false);
 	SetTrieValue(g_hBlockedCmds, "changelevel", 			true);
 	SetTrieValue(g_hBlockedCmds, "cl_fullupdate",			false);
 	SetTrieValue(g_hBlockedCmds, "dbghist_addline", 		false);
-	SetTrieValue(g_hBlockedCmds, "dbghist_dump", 			true);
-	SetTrieValue(g_hBlockedCmds, "drawcross",			true);
-	SetTrieValue(g_hBlockedCmds, "drawline",			true);
-	SetTrieValue(g_hBlockedCmds, "dump_entity_sizes", 		true);
-	SetTrieValue(g_hBlockedCmds, "dump_globals", 			true);
-	SetTrieValue(g_hBlockedCmds, "dump_panels", 			true);
-	SetTrieValue(g_hBlockedCmds, "dump_terrain", 			true);
-	SetTrieValue(g_hBlockedCmds, "dumpcountedstrings", 		true);
-	SetTrieValue(g_hBlockedCmds, "dumpentityfactories", 		true);
-	SetTrieValue(g_hBlockedCmds, "dumpeventqueue", 			true);
+	SetTrieValue(g_hBlockedCmds, "dbghist_dump", 			false);
+	SetTrieValue(g_hBlockedCmds, "drawcross",			false);
+	SetTrieValue(g_hBlockedCmds, "drawline",			false);
+	SetTrieValue(g_hBlockedCmds, "dump_entity_sizes", 		false);
+	SetTrieValue(g_hBlockedCmds, "dump_globals", 			false);
+	SetTrieValue(g_hBlockedCmds, "dump_panels", 			false);
+	SetTrieValue(g_hBlockedCmds, "dump_terrain", 			false);
+	SetTrieValue(g_hBlockedCmds, "dumpcountedstrings", 		false);
+	SetTrieValue(g_hBlockedCmds, "dumpentityfactories", 		false);
+	SetTrieValue(g_hBlockedCmds, "dumpeventqueue", 			false);
 	SetTrieValue(g_hBlockedCmds, "dumpgamestringtable", 		false);
-	SetTrieValue(g_hBlockedCmds, "editdemo", 			true);
-	SetTrieValue(g_hBlockedCmds, "endround", 			true);
-	SetTrieValue(g_hBlockedCmds, "groundlist", 			true);
-	SetTrieValue(g_hBlockedCmds, "listmodels", 			true);
+	SetTrieValue(g_hBlockedCmds, "editdemo", 			false);
+	SetTrieValue(g_hBlockedCmds, "endround", 			false);
+	SetTrieValue(g_hBlockedCmds, "groundlist", 			false);
+	SetTrieValue(g_hBlockedCmds, "listmodels", 			false);
 	SetTrieValue(g_hBlockedCmds, "map_showspawnpoints",		false);
-	SetTrieValue(g_hBlockedCmds, "mem_dump", 			true);
-	SetTrieValue(g_hBlockedCmds, "mp_dump_timers", 			true);
+	SetTrieValue(g_hBlockedCmds, "mem_dump", 			false);
+	SetTrieValue(g_hBlockedCmds, "mp_dump_timers", 			false);
 	SetTrieValue(g_hBlockedCmds, "npc_ammo_deplete", 		false);
 	SetTrieValue(g_hBlockedCmds, "npc_heal", 			false);
 	SetTrieValue(g_hBlockedCmds, "npc_speakall", 			false);
 	SetTrieValue(g_hBlockedCmds, "npc_thinknow", 			false);
-	SetTrieValue(g_hBlockedCmds, "physics_budget",			true);
-	SetTrieValue(g_hBlockedCmds, "physics_debug_entity", 		true);
+	SetTrieValue(g_hBlockedCmds, "physics_budget",			false);
+	SetTrieValue(g_hBlockedCmds, "physics_debug_entity", 		false);
 	SetTrieValue(g_hBlockedCmds, "physics_highlight_active", 	false);
-	SetTrieValue(g_hBlockedCmds, "physics_report_active", 		true);
-	SetTrieValue(g_hBlockedCmds, "physics_select", 			true);
+	SetTrieValue(g_hBlockedCmds, "physics_report_active", 		false);
+	SetTrieValue(g_hBlockedCmds, "physics_select", 			false);
 	SetTrieValue(g_hBlockedCmds, "q_sndrcn", 			true);
-	SetTrieValue(g_hBlockedCmds, "scene_flush", 			true);
+	SetTrieValue(g_hBlockedCmds, "report_entities", 		false);
+	SetTrieValue(g_hBlockedCmds, "report_touchlinks", 		false);
+	SetTrieValue(g_hBlockedCmds, "report_simthinklist", 		false);
+	SetTrieValue(g_hBlockedCmds, "respawn_entities",		false);
+	SetTrieValue(g_hBlockedCmds, "rr_reloadresponsesystems", 	false);
+	SetTrieValue(g_hBlockedCmds, "scene_flush", 			false);
 	SetTrieValue(g_hBlockedCmds, "send_me_rcon", 			true);
+	SetTrieValue(g_hBlockedCmds, "snd_digital_surround",		false);
 	SetTrieValue(g_hBlockedCmds, "snd_restart", 			false);
-	SetTrieValue(g_hBlockedCmds, "soundlist", 			true);
+	SetTrieValue(g_hBlockedCmds, "soundlist", 			false);
 	SetTrieValue(g_hBlockedCmds, "soundscape_flush", 		false);
-	SetTrieValue(g_hBlockedCmds, "sv_benchmark_force_start", 	true);
-	SetTrieValue(g_hBlockedCmds, "sv_findsoundname", 		true);
-	SetTrieValue(g_hBlockedCmds, "sv_soundemitter_filecheck", 	true);
-	SetTrieValue(g_hBlockedCmds, "sv_soundemitter_flush", 		true);
-	SetTrieValue(g_hBlockedCmds, "sv_soundscape_printdebuginfo", 	true);
-	SetTrieValue(g_hBlockedCmds, "report_entities", 		true);
-	SetTrieValue(g_hBlockedCmds, "report_touchlinks", 		true);
-	SetTrieValue(g_hBlockedCmds, "report_simthinklist", 		true);
-	SetTrieValue(g_hBlockedCmds, "respawn_entities",		true);
-	SetTrieValue(g_hBlockedCmds, "rr_reloadresponsesystems", 	true);
+	SetTrieValue(g_hBlockedCmds, "sv_benchmark_force_start", 	false);
+	SetTrieValue(g_hBlockedCmds, "sv_findsoundname", 		false);
+	SetTrieValue(g_hBlockedCmds, "sv_soundemitter_filecheck", 	false);
+	SetTrieValue(g_hBlockedCmds, "sv_soundemitter_flush", 		false);
+	SetTrieValue(g_hBlockedCmds, "sv_soundscape_printdebuginfo", 	false);
 	SetTrieValue(g_hBlockedCmds, "wc_update_entity", 		false);
 
 	if ( g_bCmdEnabled )
@@ -153,7 +154,8 @@ Commands_OnAllPluginsLoaded()
 	else
 		g_hCountReset = INVALID_HANDLE;
 
-	if ( !g_bIsNewSM || GetFeatureStatus(FeatureType_Capability, FEATURECAP_COMMANDLISTENER) != FeatureStatus_Available || !AddCommandListener(Commands_CommandListener) )
+	// Leaving this in as a fall back incase game isn't compatible with the command listener.
+	if ( GetFeatureStatus(FeatureType_Capability, FEATURECAP_COMMANDLISTENER) != FeatureStatus_Available || !AddCommandListener(Commands_CommandListener) )
 	{
 		f_hConCommand = FindFirstConCommand(f_sName, sizeof(f_sName), f_bIsCommand, f_iFlags);
 		if ( f_hConCommand == INVALID_HANDLE )
@@ -212,13 +214,8 @@ public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:d
 #endif
 			}
 		}
-		if ( g_bIsNewSM )
-		{
-			SetEventBroadcast(event, true);
-			return Plugin_Continue;
-		}
-		else
-			return Plugin_Stop;
+		SetEventString(event, "reason", "Bad disconnect message");
+		return Plugin_Continue;
 	}
 	f_iLength = strlen(f_sReason);
 	for(new i=0;i<f_iLength;i++)
@@ -238,13 +235,8 @@ public Action:Commands_EventDisconnect(Handle:event, const String:name[], bool:d
 #endif
 					
 				}
-				if ( g_bIsNewSM )
-				{
-					SetEventBroadcast(event, true);
-					return Plugin_Continue;
-				}
-				else
-					return Plugin_Stop;
+				SetEventString(event, "reason", "Bad disconnect message");
+				return Plugin_Continue;
 			}
 		}
 	}
@@ -384,7 +376,20 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 		return Plugin_Stop;
 	if ( !g_bCmdEnabled )
 		return Plugin_Continue;
-	
+
+	// Check to see if this person is command spamming.
+	if ( g_iCmdSpam != 0 && !StrEqual(command, "buy") && !StrEqual(command, "use") && !StrEqual(command, "buyammo1") && !StrEqual(command, "buyammo2") && ( StrContains(command, "es_") == -1 || StrEqual(command, "es_version") ) && g_iCmdCount[client]++ > g_iCmdSpam )
+	{
+		decl String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
+		GetClientName(client, f_sName, sizeof(f_sName));
+		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
+		GetClientIP(client, f_sIP, sizeof(f_sIP));
+		GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
+		KAC_Log("%s (ID: %s | IP: %s) was kicked for command spamming: %s %s", f_sName, f_sAuthID, f_sIP, command, f_sCmdString);
+		KAC_Kick(client, KAC_KCMDSPAM);
+		return Plugin_Stop;
+	}
+
 	decl bool:f_bBan;
 
 	if ( GetTrieValue(g_hBlockedCmds, command, f_bBan) )
@@ -407,18 +412,6 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 		decl String:f_sCmdString[256];
 		GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
 		LogToFileEx(g_sCmdLogPath, "%L used command: %s %s", client, command, f_sCmdString);
-	}
-
-	if ( g_iCmdSpam != 0 && !StrEqual(command, "buy") && !StrEqual(command, "use") && !StrEqual(command, "buyammo1") && !StrEqual(command, "buyammo2") && ( StrContains(command, "es_") == -1 || StrEqual(command, "es_version") ) && g_iCmdCount[client]++ > g_iCmdSpam )
-	{
-		decl String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
-		GetClientName(client, f_sName, sizeof(f_sName));
-		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
-		GetClientIP(client, f_sIP, sizeof(f_sIP));
-		GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-		KAC_Log("%s (ID: %s | IP: %s) was kicked for command spamming: %s %s", f_sName, f_sAuthID, f_sIP, command, f_sCmdString);
-		KAC_Kick(client, KAC_KCMDSPAM);
-		return Plugin_Stop;
 	}
 
 	return Plugin_Continue;

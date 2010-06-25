@@ -195,15 +195,6 @@ public Network_OnSockRecvVer(Handle:socket, String:data[], const size, any:we)
 		if ( SocketIsConnected(socket) )
 			SocketDisconnect(socket);
 
-		if ( !g_bIsNewSM )
-		{
-			g_bVCheckDone = true;
-			KAC_PrintToChatAdmins(KAC_SMOUTOFDATE);
-			LogMessage("SourceMod is out of date.  Please update SourceMod to get the latest version of KAC.");
-			CreateTimer(120.0, Network_Reminder, _, TIMER_REPEAT);
-			return;
-		}
-
 		new String:path[256], String:f_sTemp[64];
 		g_iInError = 9999;
 		LogMessage("Received that KAC is out of date, updating to newest version.");
