@@ -2,7 +2,7 @@
 
 /*
     Kigen's Anti-Cheat
-    Copyright (C) 2007-2010 Max Krivanek
+    Copyright (C) 2007-2010 CodingDirect LLC
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ new g_iGame = GAME_OTHER; // Game identifier.
 public Plugin:myinfo =
 {
     name = "Kigen's Anti-Cheat",
-    author = "Kigen", 
+    author = "CodingDirect LLC", 
     description = "The greatest thing since sliced pie", 
     version = PLUGIN_VERSION, 
     url = "http://www.kigenac.com/"
