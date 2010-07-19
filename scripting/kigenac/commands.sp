@@ -370,7 +370,7 @@ public Action:Commands_BlockEntExploit(client, args)
 
 public Action:Commands_CommandListener(client, const String:command[], argc)
 {
-	if ( !client )
+	if ( !client || IsFakeClient(client) )
 		return Plugin_Continue;
 	if ( !g_bInGame[client] )
 		return Plugin_Stop;
@@ -419,7 +419,7 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 
 public Action:Commands_ClientCheck(client, args)
 {
-	if ( !client )
+	if ( !client || IsFakeClient(client) )
 		return Plugin_Continue;
 	if ( !g_bInGame[client] )
 		return Plugin_Stop;
@@ -457,7 +457,7 @@ public Action:Commands_ClientCheck(client, args)
 
 public Action:Commands_SpamCheck(client, args)
 {
-	if ( !client )
+	if ( !client || IsFakeClient(client) )
 		return Plugin_Continue;
 	if ( !g_bInGame[client] )
 		return Plugin_Stop;
