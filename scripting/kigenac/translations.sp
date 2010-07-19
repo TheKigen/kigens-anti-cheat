@@ -81,6 +81,8 @@
 #define KAC_AUTOASSIGNED "KAC_AUTOASSIGNED"
 #define KAC_SAYBLOCK "KAC_SAYBLOCK"
 #define KAC_SMOUTOFDATE "KAC_SMOUTOFDATE"
+#define KAC_FORCEDREVAL "KAC_FORCEDREVAL"
+#define KAC_CANNOTREVAL "KAC_CANNOTREVAL"
 
 new Handle:g_hLanguages = INVALID_HANDLE;
 
@@ -160,6 +162,8 @@ Trans_OnPluginStart()
 	SetTrieString(f_hTemp, KAC_AUTOASSIGNED, 	"[KAC] You have been Auto-Assigned to a team.");
 	SetTrieString(f_hTemp, KAC_SAYBLOCK, 		"[KAC] Your say has been blocked due to a invalid character.");
 	SetTrieString(f_hTemp, KAC_SMOUTOFDATE,		"[KAC] Your SourceMod is out of date.  Please update SourceMod to get the latest KAC version.");
+	SetTrieString(f_hTemp, KAC_FORCEDREVAL, 	"[KAC] Forced revalidation on all connected players.");
+	SetTrieString(f_hTemp, KAC_CANNOTREVAL, 	"[KAC] Cannot force revalidation until all player have already been validated.");
 
 	//- Dutch -//
 /*	if ( !GetTrieValue(g_hLanguages, "nl", any:f_hTemp) || f_hTemp == INVALID_HANDLE )

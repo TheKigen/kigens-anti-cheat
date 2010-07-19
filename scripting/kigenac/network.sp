@@ -73,13 +73,30 @@ Network_OnClientDisconnect(client)
 
 public Action:Network_Checked(client, args)
 {
+	if ( args )
+	{
+		new String:f_sArg[64];
+		GetCmdArg(1, f_sArg, sizeof(f_sArg));
+		if ( StrEqual(f_sArg, "revalidate") )
+		{
+			for(new i=1;i<=MaxClients;i++)
+				if ( g_bInGame[i] && !g_bChecked[i] )
+				{
+					KAC_ReplyToCommand(client, KAC_CANNOTREVAL);
+					return Plugin_Handled;
+				}
+			for(new i=1;i<=MaxClients;i++)
+				g_bChecked[i] = false;
+			
+			KAC_ReplyToCommand(client, KAC_FORCEDREVAL);
+			return Plugin_Handled;
+		}
+	}
+
 	new String:f_sName[64], String:f_sAuthID[64];
 	for(new i=1;i<=MaxClients;i++)
 		if ( g_bInGame[i] && GetClientName(i, f_sName, sizeof(f_sName)) && GetClientAuthString(i, f_sAuthID, sizeof(f_sAuthID)) )
 			ReplyToCommand(client, "%s (%s): %s", f_sName, f_sAuthID, (g_bChecked[i]) ? "Checked" : "Waiting");
-
-	if ( !g_bIsNewSM )
-		ReplyToCommand(client, "Your SourceMod version is out of date.  Please update SourceMod to 1.3 or later.");
 
 	return Plugin_Handled;
 }
