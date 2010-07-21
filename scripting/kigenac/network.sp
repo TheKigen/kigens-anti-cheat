@@ -124,7 +124,6 @@ public Action:Network_Timer(Handle:timer, any:we)
 		g_iInError = 12; // Wait 30 seconds.
 		g_hSocket = SocketCreate(SOCKET_TCP, Network_OnSockErrVer);
 		SocketConnect(g_hSocket, Network_OnSockConnVer, Network_OnSockRecvVer, Network_OnSockDiscVer, "master.kigenac.com", 9652);
-		LogMessage("Checking version....");
 		return Plugin_Continue;
 	}
 
@@ -144,14 +143,9 @@ public Action:Network_Timer(Handle:timer, any:we)
 
 public Action:Network_VTimer(Handle:timer, any:we)
 {
+	g_hVTimer = INVALID_HANDLE;
 	g_bVCheckDone = false;
 	return Plugin_Stop;
-}
-
-public Action:Network_Reminder(Handle:timer, any:we)
-{
-	KAC_PrintToChatAdmins(KAC_SMOUTOFDATE);
-	return Plugin_Continue;
 }
 
 //- Socket Functions -//
@@ -169,7 +163,6 @@ public Network_OnSockErrVer(Handle:socket, const errorType, const errorNum, any:
 	if ( !g_bVCheckDone )
 		g_iInError = 12;
 	g_hSocket = INVALID_HANDLE;
-	LogError("Error received during update: Failed to contact master server.");
 	Status_Report(g_iNetStatus, KAC_UNABLETOCONTACT);
 	CloseHandle(socket);
 }
@@ -197,13 +190,11 @@ public Network_OnSockRecvVer(Handle:socket, String:data[], const size, any:we)
 	if ( StrEqual(data, "_SEND") )
 	{
 		SocketSend(socket, PLUGIN_VERSION, 7);
-		LogMessage("Sending version %s to KAC Master.", PLUGIN_VERSION);
 	}
 	else if ( StrEqual(data, "_UPTODATE") )
 	{
 		g_bVCheckDone = true;
 		g_hVTimer = CreateTimer(14400.0, Network_VTimer); 
-		LogMessage("Received that KAC is up-to-date.");
 		if ( SocketIsConnected(socket) )
 			SocketDisconnect(socket);
 	}
@@ -381,10 +372,6 @@ public Network_OnSocketReceive(Handle:socket, String:data[], const size, any:cli
 		SetTrieString(g_hDenyArray, f_sAuthID, f_sBuffer);
 		KAC_Log("%s (%s) is on the KAC global banlist.", f_sName, f_sAuthID);
 		KAC_Kick(client, KAC_GBANNED);
-	} 
-	else if ( StrEqual(data, "_CAFE") )
-	{
-		// No longer in use.
 	}
 	else if ( StrEqual(data, "_OK") )
 	{
