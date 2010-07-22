@@ -151,7 +151,7 @@ public Action:Eyetest_Timer(Handle:timer, any:we)
 			{	
 				GetClientAuthString(i, f_sAuthID, sizeof(f_sAuthID));
 				GetClientIP(i, f_sIP, sizeof(f_sIP));
-				KAC_Log("%N (ID: %s | IP: %s) was banned for cheating with their eye angles.  Eye Angles: %f %f %f", client, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
+				KAC_Log("%N (ID: %s | IP: %s) was banned for cheating with their eye angles.  Eye Angles: %f %f %f", i, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
 				KAC_Ban(i, 0, KAC_BANNED, "KAC: Eye Angles Violation");
 #if defined PRIVATE
 				Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) was banned for bad eye angles: %f %f %f.", client, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
