@@ -22,7 +22,7 @@
 new Handle:g_hBlockedCmds = INVALID_HANDLE;
 new bool:g_bCmdEnabled = true;
 new bool:g_bLogCmds = false;
-new g_iCmdSpam = 10;
+new g_iCmdSpam = 30;
 new g_iCmdCount[MAXPLAYERS+2] = {0, ...};
 new Handle:g_hCountReset = INVALID_HANDLE;
 new Handle:g_hCVarCmdEnable = INVALID_HANDLE;
@@ -44,7 +44,7 @@ Commands_OnPluginStart()
 
 	g_hCVarCmdSpam = FindConVar("kac_cmds_spam");
 	if ( g_hCVarCmdSpam == INVALID_HANDLE )
-		g_hCVarCmdSpam = CreateConVar("kac_cmds_spam", "10", "Amount of commands in one second before kick.  0 for disable.");
+		g_hCVarCmdSpam = CreateConVar("kac_cmds_spam", "30", "Amount of commands in one second before kick.  0 for disable.");
 	else
 		g_iCmdSpam = GetConVarInt(g_hCVarCmdSpam);
 
