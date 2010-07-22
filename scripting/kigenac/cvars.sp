@@ -65,9 +65,9 @@ new Handle:g_hCVarIndex = INVALID_HANDLE;
 new Handle:g_hCurrentQuery[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
 new Handle:g_hReplyTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
 new Handle:g_hPeriodicTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
-new String:g_sQueryResult[4][] = {"Okay", "Not found", "Not valid", "Protected"};
+new String:g_sQueryResult[][] = {"Okay", "Not found", "Not valid", "Protected"};
 new g_iCurrentIndex[MAXPLAYERS+1] = {0, ...};
-new g_iRetryAttmpts[MAXPLAYERS+1] = {0, ...};
+new g_iRetryAttempts[MAXPLAYERS+1] = {0, ...};
 new g_iSize = 0;
 new g_iCVarsStatus;
 
@@ -178,6 +178,7 @@ CVars_OnPluginStart()
 	//- Register Admin Commands -//
 	RegAdminCmd("kac_addcvar",	CVars_CmdAddCVar,	ADMFLAG_ROOT, 	"Adds a CVar to the check list.");
 	RegAdminCmd("kac_removecvar", 	CVars_CmdRemCVar, 	ADMFLAG_ROOT, 	"Removes a CVar from the check list.");
+	RegAdminCmd("kac_cvars_status", CVars_CmdStatus, 	ADMFLAG_GENERIC,"Shows the status of all in-game clients.");
 
 	if ( g_bCVarsEnabled )
 		g_iCVarsStatus = Status_Register(KAC_CVARS, KAC_ON);
@@ -191,7 +192,7 @@ CVars_OnClientDisconnect(client)
 	decl Handle:f_hTemp;
 	
 	g_iCurrentIndex[client] = 0;
-	g_iRetryAttmpts[client] = 0;
+	g_iRetryAttempts[client] = 0;
 
 	f_hTemp = g_hPeriodicTimer[client];
 	if ( f_hTemp != INVALID_HANDLE )
@@ -209,6 +210,40 @@ CVars_OnClientDisconnect(client)
 
 //- Admin Commands -//
 
+public Action:CVars_CmdStatus(client, args)
+{
+	if ( client && !IsClientInGame(client) )
+		return Plugin_Handled;
+
+	new String:f_sAuth[64], String:f_sCVarName[64], Handle:f_hTemp;
+
+	for(new i=1;i<=MaxClients;i++)
+	{
+		if ( g_bInGame[i] )
+		{
+			GetClientAuthString(i, f_sAuth, sizeof(f_sAuth));
+			f_hTemp = g_hCurrentQuery[client];
+			if ( f_hTemp == INVALID_HANDLE )
+			{
+				if ( g_hPeriodicTimer[i] == INVALID_HANDLE )
+				{
+					LogError("%N (%s) doesn't have a periodic timer running and no active queries.", i, f_sAuth);
+					ReplyToCommand(client, "ERROR: %N (%s) didn't have a periodic timer running nor active queries.", i, f_sAuth);
+					g_hPeriodicTimer[i] = CreateTimer(0.1, CVars_PeriodicTimer, i);
+					continue;
+				}
+				ReplyToCommand(client, "%N (%s) is waiting for new query. Current Index: %d.", i, f_sAuth, g_iCurrentIndex[i]);
+			}
+			else
+			{
+				GetArrayString(f_hTemp, CELL_NAME, f_sCVarName, sizeof(f_sCVarName));
+				ReplyToCommand(client, "%N (%s) has active query on %s. Current Index: %d. Retry Attempts: %d.", i, f_sAuth, f_sCVarName, g_iCurrentIndex[i], g_iRetryAttempts[i]);
+			}
+		}
+	}
+	return Plugin_Handled;
+}
+
 public Action:CVars_CmdAddCVar(client, args)
 {
 #if defined PRIVATE
@@ -220,7 +255,7 @@ public Action:CVars_CmdAddCVar(client, args)
 		return Plugin_Handled;
 	}
 
-	decl String:f_sCVarName[64], String:f_sTemp[64], f_iCompType, f_iAction, String:f_sValue[64], Float:f_fValue2, String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64];
+	decl String:f_sCVarName[64], String:f_sTemp[64], f_iCompType, f_iAction, String:f_sValue[64], Float:f_fValue2, String:f_sAuthID[64], String:f_sIP[64];
 
 	GetCmdArg(1, f_sCVarName, sizeof(f_sCVarName));
 
@@ -278,13 +313,10 @@ public Action:CVars_CmdAddCVar(client, args)
 	{
 		if ( client )
 		{
-			GetClientName(client, f_sName, sizeof(f_sName));
 			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
-			KAC_Log("%s (ID: %s | IP: %s) added convar %s to the check list.", f_sName, f_sAuthID, f_sIP, f_sCVarName);
+			KAC_Log("%N (ID: %s | IP: %s) added convar %s to the check list.", client, f_sAuthID, f_sIP, f_sCVarName);
 		}
-		else
-			KAC_Log("Console added convar %s to the check list.", f_sCVarName);
 		KAC_ReplyToCommand(client, KAC_ADDCVARSUCCESS, f_sCVarName);
 	}
 	else
@@ -304,7 +336,7 @@ public Action:CVars_CmdRemCVar(client, args)
 		return Plugin_Handled;
 	}
 
-	decl String:f_sCVarName[64], String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64];
+	decl String:f_sCVarName[64], String:f_sAuthID[64], String:f_sIP[64];
 
 	GetCmdArg(1, f_sCVarName, sizeof(f_sCVarName));
 
@@ -312,10 +344,9 @@ public Action:CVars_CmdRemCVar(client, args)
 	{
 		if ( client )
 		{
-			GetClientName(client, f_sName, sizeof(f_sName));
 			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
-			KAC_Log("%s (ID: %s | IP: %s) removed convar %s from the check list.", f_sName, f_sAuthID, f_sIP, f_sCVarName);
+			KAC_Log("%N (ID: %s | IP: %s) removed convar %s from the check list.", client, f_sAuthID, f_sIP, f_sCVarName);
 		}
 		else
 			KAC_Log("Console removed convar %s from the check list.", f_sCVarName);
@@ -385,7 +416,7 @@ public Action:CVars_ReplyTimer(Handle:timer, any:userid)
 	if ( !g_bCVarsEnabled || !g_bConnected[client] || g_hPeriodicTimer[client] != INVALID_HANDLE )
 		return Plugin_Stop;
 
-	if ( g_iRetryAttmpts[client]++ > 3 )
+	if ( g_iRetryAttempts[client]++ > 3 )
 		KAC_Kick(client, KAC_FAILEDTOREPLY);
 	else
 	{
@@ -443,55 +474,59 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 		return;
 	}
 
-	decl String:f_sCVarName[64], Handle:f_hConVar, Handle:f_hTemp, String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], f_iCompType, f_iAction, String:f_sValue[64], Float:f_fValue2, String:f_sAlternative[128], f_iSize;
+	decl String:f_sCVarName[64], Handle:f_hConVar, Handle:f_hTemp, String:f_sAuthID[64], String:f_sIP[64], f_iCompType, f_iAction, String:f_sValue[64], Float:f_fValue2, String:f_sAlternative[128], f_iSize, bool:f_bContinue;
 
 	// Get Client Info
-	GetClientName(client, f_sName, sizeof(f_sName));
 	GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 	GetClientIP(client, f_sIP, sizeof(f_sIP));
 
 	if ( g_hPeriodicTimer[client] != INVALID_HANDLE )
-	{
-		KAC_Log("Unexpected CVar Reply: %s (ID: %s | IP: %s) replied with unexpected convar \"%s\" (not expecting; result \"%s\") with value \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, g_sQueryResult[result], cvarValue);
-		return;
-	}
-
-	f_hTemp = g_hReplyTimer[client];
-	if ( f_hTemp != INVALID_HANDLE )
-	{
-		g_hReplyTimer[client] = INVALID_HANDLE;
-		CloseHandle(f_hTemp);
-		g_iRetryAttmpts[client] = 0;
-	}
+		f_bContinue = false;
+	else
+		f_bContinue = true;
 
 	f_hConVar = g_hCurrentQuery[client];
-	g_hCurrentQuery[client] = INVALID_HANDLE;
-	// We weren't expecting a reply or convar we queried is no longer valid or was changed.
-	if ( f_hConVar == INVALID_HANDLE )
+
+	// We weren't expecting a reply or convar we queried is no longer valid and we cannot find it.
+	if ( f_hConVar == INVALID_HANDLE && !GetTrieValue(g_hCVarIndex, cvarName, f_hConVar) )
 	{
-		g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(0.5, 2.0), CVars_PeriodicTimer, client);
+		if ( g_hPeriodicTimer[client] == INVALID_HANDLE ) // Client doesn't have active query or a timer active for them?  Ballocks!
+			g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(0.5, 2.0), CVars_PeriodicTimer, client);
 		return;
 	}
 
-	// Make sure this query replied correctly.
 	GetArrayString(f_hConVar, CELL_NAME, f_sCVarName, sizeof(f_sCVarName));
+
+	// Make sure this query replied correctly.
 	if ( !StrEqual(cvarName, f_sCVarName) ) // CVar not expected.
 	{
-		if ( !GetTrieValue(g_hCVarIndex, cvarName, f_hTemp) ) // CVar doesn't exist in our list.
+		if ( !GetTrieValue(g_hCVarIndex, cvarName, f_hConVar) ) // CVar doesn't exist in our list.
 		{
-			KAC_Log("Unknown CVar Reply: %s (ID: %s | IP: %s) was kicked for a corrupted return with convar name \"%s\" (expecting \"%s\") with value \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, f_sCVarName, cvarValue);
+			KAC_Log("Unknown CVar Reply: %N (ID: %s | IP: %s) was kicked for a corrupted return with convar name \"%s\" (expecting \"%s\") with value \"%s\".", client, f_sAuthID, f_sIP, cvarName, f_sCVarName, cvarValue);
 			KAC_Kick(client, KAC_CLIENTCORRUPT);
+			return;
 		}
 		else
-		{
-			KAC_Log("Unexpected CVar Reply: %s (ID: %s | IP: %s) was kicked for returning convar \"%s\" (expecting \"%s\") out of sync with value \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, f_sCVarName, cvarValue);
-			KAC_Kick(client, KAC_CLIENTCORRUPT);
-		}
-		return;
+			f_bContinue = false;
+
+		GetArrayString(f_hConVar, CELL_NAME, f_sCVarName, sizeof(f_sCVarName));
 	}
 
 	f_iCompType = GetArrayCell(f_hConVar, CELL_COMPTYPE);
 	f_iAction = GetArrayCell(f_hConVar, CELL_ACTION);
+
+	if ( f_bContinue )
+	{
+		f_hTemp = g_hReplyTimer[client];
+		g_hCurrentQuery[client] = INVALID_HANDLE;
+
+		if ( f_hTemp != INVALID_HANDLE )
+		{
+			g_hReplyTimer[client] = INVALID_HANDLE;
+			CloseHandle(f_hTemp);
+			g_iRetryAttempts[client] = 0;
+		}
+	}
 
 	// Check if it should exist.
 	if ( f_iCompType == COMP_NONEXIST )
@@ -502,7 +537,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 			{
 				case ACTION_WARN:
 				{
-					KAC_PrintToChatAdmins(KAC_HASPLUGIN, f_sName, f_sAuthID, f_sCVarName);
+					KAC_PrintToChatAdmins(KAC_HASPLUGIN, client, f_sAuthID, f_sCVarName);
 				}
 				case ACTION_MOTD:
 				{
@@ -511,36 +546,37 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				}
 				case ACTION_MUTE:
 				{
-					KAC_PrintToChatAll(KAC_MUTED, f_sName);
+					KAC_PrintToChatAll(KAC_MUTED, client);
 					ServerCommand("sm_mute #%d", GetClientUserId(client));
 				}
 				case ACTION_KICK:
 				{
-					KAC_Log("Plugin CVar return: %s (ID: %s | IP: %s) was kicked for returning with plugin convar \"%s\" (value \"%s\", return %s).", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
+					KAC_Log("Plugin CVar return: %N (ID: %s | IP: %s) was kicked for returning with plugin convar \"%s\" (value \"%s\", return %s).", client, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
 					KAC_Kick(client, KAC_REMOVEPLUGINS);
 					return;
 				}
 				case ACTION_BAN:
 				{
-					KAC_Log("Bad CVar return: %s (ID: %s | IP: %s) has convar \"%s\" (value \"%s\", return %s) when it shouldn't exist.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
+					KAC_Log("Bad CVar return: %N (ID: %s | IP: %s) has convar \"%s\" (value \"%s\", return %s) when it shouldn't exist.", client, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
 					KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
-					Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) had convar \"%s\" set to \"%s\" (return %s) when it shouldn't exist.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
+					Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) had convar \"%s\" set to \"%s\" (return %s) when it shouldn't exist.", client, f_sAuthID, f_sIP, cvarName, cvarValue, g_sQueryResult[result]);
 #endif
 					return;
 				}
 			}
 		}
-		g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(1.0, 3.0), CVars_PeriodicTimer, client);
+		if ( f_bContinue )
+			g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(1.0, 3.0), CVars_PeriodicTimer, client);
 		return;
 	}
 
 	if ( result != ConVarQuery_Okay ) // ConVar should exist.
 	{
-		KAC_Log("Bad CVar Query Result: %s (ID: %s | IP: %s) returned query result \"%s\" (expected Okay) on convar \"%s\" (value \"%s\").", f_sName, f_sAuthID, f_sIP, g_sQueryResult[result], cvarName, cvarValue);
+		KAC_Log("Bad CVar Query Result: %N (ID: %s | IP: %s) returned query result \"%s\" (expected Okay) on convar \"%s\" (value \"%s\").", client, f_sAuthID, f_sIP, g_sQueryResult[result], cvarName, cvarValue);
 		KAC_Ban(client, 0, KAC_BANNED, "KAC: %s violation (bad query result).", cvarName);
 #if defined PRIVATE
-		Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) returned bad query result \"%s\" (expected Okay) on convar \"%s\" (value \"%s\").", f_sName, f_sAuthID, f_sIP, g_sQueryResult[result], cvarName, cvarValue);
+		Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) returned bad query result \"%s\" (expected Okay) on convar \"%s\" (value \"%s\").", client, f_sAuthID, f_sIP, g_sQueryResult[result], cvarName, cvarValue);
 #endif
 		return;
 	}
@@ -568,7 +604,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 		{
 			if ( !IsCharNumeric(cvarValue[i]) && cvarValue[i] != '.' )
 			{
-				KAC_Log("Corrupted CVar response: %s (ID: %s | IP: %s) was kicked for returning a corrupted value on %s (%s), value set at \"%s\" (expected \"%s\").", f_sName, f_sAuthID, f_sIP, f_sCVarName, cvarName, cvarValue, f_sValue);
+				KAC_Log("Corrupted CVar response: %N (ID: %s | IP: %s) was kicked for returning a corrupted value on %s (%s), value set at \"%s\" (expected \"%s\").", client, f_sAuthID, f_sIP, f_sCVarName, cvarName, cvarValue, f_sValue);
 				KAC_Kick(client, KAC_CLIENTCORRUPT);
 				return;
 			}
@@ -585,7 +621,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				{
 					case ACTION_WARN:
 					{
-						KAC_PrintToChatAdmins(KAC_HASNOTEQUAL, f_sName, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
+						KAC_PrintToChatAdmins(KAC_HASNOTEQUAL, client, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
 					}
 					case ACTION_MOTD:
 					{
@@ -594,21 +630,21 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 					}
 					case ACTION_MUTE:
 					{
-						KAC_PrintToChatAll(KAC_MUTED, f_sName);
+						KAC_PrintToChatAll(KAC_MUTED, client);
 						ServerCommand("sm_mute #%d", GetClientUserId(client));
 					}
 					case ACTION_KICK:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Kick(client, KAC_SHOULDEQUAL, cvarName, f_sValue, cvarValue);
 						return;
 					}
 					case ACTION_BAN:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should equal.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should equal.", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
-						Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 #endif
 						return;
 					}
@@ -621,7 +657,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				{
 					case ACTION_WARN:
 					{
-						KAC_PrintToChatAdmins(KAC_HASNOTGREATER, f_sName, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
+						KAC_PrintToChatAdmins(KAC_HASNOTGREATER, client, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
 					}
 					case ACTION_MOTD:
 					{
@@ -630,21 +666,21 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 					}
 					case ACTION_MUTE:
 					{
-						KAC_PrintToChatAll(KAC_MUTED, f_sName);
+						KAC_PrintToChatAll(KAC_MUTED, client);
 						ServerCommand("sm_mute #%d", GetClientUserId(client));
 					}
 					case ACTION_KICK:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be greater than or equal to \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be greater than or equal to \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Kick(client, KAC_SHOULDGREATER, cvarName, f_sValue, cvarValue);
 						return;
 					}
 					case ACTION_BAN:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should greater than or equal to.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should greater than or equal to.", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
-						Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be greater than or equal to \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be greater than or equal to \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 #endif
 						return;
 					}
@@ -657,7 +693,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				{
 					case ACTION_WARN:
 					{
-						KAC_PrintToChatAdmins(KAC_HASNOTLESS, f_sName, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
+						KAC_PrintToChatAdmins(KAC_HASNOTLESS, client, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
 					}
 					case ACTION_MOTD:
 					{
@@ -666,21 +702,21 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 					}
 					case ACTION_MUTE:
 					{
-						KAC_PrintToChatAll(KAC_MUTED, f_sName);
+						KAC_PrintToChatAll(KAC_MUTED, client);
 						ServerCommand("sm_mute #%d", GetClientUserId(client));
 					}
 					case ACTION_KICK:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be less than or equal to \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be less than or equal to \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Kick(client, KAC_SHOULDLESS, cvarName, f_sValue, cvarValue);
 						return;
 					}
 					case ACTION_BAN:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should be less than or equal to.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should be less than or equal to.", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
-						Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be less than or equal to \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be less than or equal to \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 #endif
 						return;
 					}
@@ -693,7 +729,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				{
 					case ACTION_WARN:
 					{
-						KAC_PrintToChatAdmins(KAC_HASNOTBOUND, f_sName, f_sAuthID, f_sCVarName, cvarValue, f_sValue, f_fValue2);
+						KAC_PrintToChatAdmins(KAC_HASNOTBOUND, client, f_sAuthID, f_sCVarName, cvarValue, f_sValue, f_fValue2);
 					}
 					case ACTION_MOTD:
 					{
@@ -702,21 +738,21 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 					}
 					case ACTION_MUTE:
 					{
-						KAC_PrintToChatAll(KAC_MUTED, f_sName);
+						KAC_PrintToChatAll(KAC_MUTED, client);
 						ServerCommand("sm_mute #%d", GetClientUserId(client));
 					}
 					case ACTION_KICK:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be between \"%s\" and \"%f\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue, f_fValue2);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be between \"%s\" and \"%f\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue, f_fValue2);
 						KAC_Kick(client, KAC_SHOULDBOUND, cvarName, f_sValue, f_fValue2, cvarValue);
 						return;
 					}
 					case ACTION_BAN:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" when it should be between \"%s\" and \"%f\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue, f_fValue2);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" when it should be between \"%s\" and \"%f\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue, f_fValue2);
 						KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
-						Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be between \"%s\" and \"%f\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue, f_fValue2);
+						Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be between \"%s\" and \"%f\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue, f_fValue2);
 #endif
 						return;
 					}
@@ -729,7 +765,7 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 				{
 					case ACTION_WARN:
 					{
-						KAC_PrintToChatAdmins(KAC_HASNOTEQUAL, f_sName, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
+						KAC_PrintToChatAdmins(KAC_HASNOTEQUAL, client, f_sAuthID, f_sCVarName, cvarValue, f_sValue);
 					}
 					case ACTION_MOTD:
 					{
@@ -738,21 +774,21 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 					}
 					case ACTION_MUTE:
 					{
-						KAC_PrintToChatAll(KAC_MUTED, f_sName);
+						KAC_PrintToChatAll(KAC_MUTED, client);
 						ServerCommand("sm_mute #%d", GetClientUserId(client));
 					}
 					case ACTION_KICK:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) was kicked for returning with convar \"%s\" set to value \"%s\" when it should be \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Kick(client, KAC_SHOULDEQUAL, cvarName, f_sValue, cvarValue);
 						return;
 					}
 					case ACTION_BAN:
 					{
-						KAC_Log("Bad CVar response: %s (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should equal.", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						KAC_Log("Bad CVar response: %N (ID: %s | IP: %s) has convar \"%s\" set to value \"%s\" (should be \"%s\") when it should equal.", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 						KAC_Ban(client, 0, KAC_BANNED, "KAC: ConVar %s violation", cvarName);
 #if defined PRIVATE
-						Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be \"%s\".", f_sName, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
+						Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) returned convar \"%s\" set to \"%s\" when it should be \"%s\".", client, f_sAuthID, f_sIP, cvarName, cvarValue, f_sValue);
 #endif
 						return;
 					}
@@ -760,7 +796,8 @@ public CVars_QueryCallback(QueryCookie:cookie, client, ConVarQueryResult:result,
 			}
 	}
 	
-	g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(0.5, 2.0), CVars_PeriodicTimer, client);
+	if ( f_bContinue )
+		g_hPeriodicTimer[client] = CreateTimer(GetRandomFloat(0.5, 2.0), CVars_PeriodicTimer, client);
 	
 }
 
@@ -942,7 +979,7 @@ CVars_ReplicateConVar(Handle:f_hConVar)
 			if ( !IsClientConnected(i) || IsFakeClient(i) )
 				OnClientDisconnect(i);
 		 	else if ( !SendConVarValue(i, f_hConVar, f_sValue) )
-				KAC_Log("%L failed to accept replication of %s (Value: %s).", i, f_sCVarName, f_sValue);
+				continue; // KAC_Log("%L failed to accept replication of %s (Value: %s).", i, f_sCVarName, f_sValue); - This happens if the netchan isn't created yet, cvars will replicate once it is created.
 		}
 	}
 }
