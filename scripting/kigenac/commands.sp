@@ -297,12 +297,11 @@ public Action:Commands_BlockExploit(client, args)
 		GetCmdArg(1, f_sArg, sizeof(f_sArg));
 		if ( StrEqual(f_sArg, "rcon_password") )
 		{
-			new String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
-			GetClientName(client, f_sName, sizeof(f_sName));
+			new String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
 			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
 			GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-			KAC_Log("%s (ID: %s | IP: %s) was banned for command usage violation of command: sm_menu %s", f_sName, f_sAuthID, f_sIP, f_sCmdString);
+			KAC_Log("%N (ID: %s | IP: %s) was banned for command usage violation of command: sm_menu %s", client, f_sAuthID, f_sIP, f_sCmdString);
 			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Exploit violation");
 			return Plugin_Stop;
 		}
@@ -380,12 +379,11 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 	// Check to see if this person is command spamming.
 	if ( g_iCmdSpam != 0 && !StrEqual(command, "buy") && !StrEqual(command, "use") && !StrEqual(command, "buyammo1") && !StrEqual(command, "buyammo2") && ( StrContains(command, "es_") == -1 || StrEqual(command, "es_version") ) && g_iCmdCount[client]++ > g_iCmdSpam )
 	{
-		decl String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
-		GetClientName(client, f_sName, sizeof(f_sName));
+		decl String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
 		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 		GetClientIP(client, f_sIP, sizeof(f_sIP));
 		GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-		KAC_Log("%s (ID: %s | IP: %s) was kicked for command spamming: %s %s", f_sName, f_sAuthID, f_sIP, command, f_sCmdString);
+		KAC_Log("%N (ID: %s | IP: %s) was kicked for command spamming: %s %s", client, f_sAuthID, f_sIP, command, f_sCmdString);
 		KAC_Kick(client, KAC_KCMDSPAM);
 		return Plugin_Stop;
 	}
@@ -396,12 +394,11 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 	{
 		if ( f_bBan )
 		{
-			new String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
-			GetClientName(client, f_sName, sizeof(f_sName));
+			decl String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
 			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
 			GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-			KAC_Log("%s (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", f_sName, f_sAuthID, f_sIP, command, f_sCmdString);
+			KAC_Log("%N (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", client, f_sAuthID, f_sIP, command, f_sCmdString);
 			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Command %s violation", command);
 		}
 		return Plugin_Stop;
@@ -434,12 +431,11 @@ public Action:Commands_ClientCheck(client, args)
 	{
 		if ( f_bBan )
 		{
-			new String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
-			GetClientName(client, f_sName, sizeof(f_sName));
+			new String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
 			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
 			GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-			KAC_Log("%s (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", f_sName, f_sAuthID, f_sIP, f_sCmd, f_sCmdString);
+			KAC_Log("%N (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", client, f_sAuthID, f_sIP, f_sCmd, f_sCmdString);
 			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Command %s violation", f_sCmd);
 		}
 		return Plugin_Stop;
@@ -470,12 +466,11 @@ public Action:Commands_SpamCheck(client, args)
 
 	if ( g_iCmdSpam != 0 && g_iCmdCount[client]++ > g_iCmdSpam )
 	{
-		decl String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
-		GetClientName(client, f_sName, sizeof(f_sName));
+		decl String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
 		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 		GetClientIP(client, f_sIP, sizeof(f_sIP));
 		GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-		KAC_Log("%s (ID: %s | IP: %s) was kicked for command spamming: %s %s", f_sName, f_sAuthID, f_sIP, f_sCmd, f_sCmdString);
+		KAC_Log("%N (ID: %s | IP: %s) was kicked for command spamming: %s %s", client, f_sAuthID, f_sIP, f_sCmd, f_sCmdString);
 		KAC_Kick(client, KAC_KCMDSPAM);
 		return Plugin_Stop;
 	}
@@ -484,12 +479,11 @@ public Action:Commands_SpamCheck(client, args)
 	{
 		if ( f_bBan )
 		{
-			new String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
-			GetClientName(client, f_sName, sizeof(f_sName));
+			decl String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[256];
 			GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 			GetClientIP(client, f_sIP, sizeof(f_sIP));
 			GetCmdArgString(f_sCmdString, sizeof(f_sCmdString));
-			KAC_Log("%s (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", f_sName, f_sAuthID, f_sIP, f_sCmd, f_sCmdString);
+			KAC_Log("%N (ID: %s | IP: %s) was banned for command usage violation of command: %s %s", client, f_sAuthID, f_sIP, f_sCmd, f_sCmdString);
 			KAC_Ban(client, 0, KAC_CBANNED, "KAC: Command %s violation", f_sCmd);
 		}
 		return Plugin_Stop;

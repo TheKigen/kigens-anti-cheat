@@ -136,7 +136,7 @@ public Action:Eyetest_Timer(Handle:timer, any:we)
 		return Plugin_Stop;
 	}
 
-	decl Float:f_vAngles[3], Float:f_fX, Float:f_fZ, String:f_sName[64], String:f_sAuthID[64], String:f_sIP[64];
+	decl Float:f_vAngles[3], Float:f_fX, Float:f_fZ, String:f_sAuthID[64], String:f_sIP[64];
 	for(new i=1;i<=MaxClients;i++)
 	{
 		if ( g_bShouldProcess[i] && GetClientEyeAngles(i, f_vAngles) )
@@ -148,14 +148,13 @@ public Action:Eyetest_Timer(Handle:timer, any:we)
 			if ( f_fZ > 180.0 )
 				f_fZ -= 360.0;
 			if ( f_fX > 90.0 || f_fX < -90.0 || f_fZ > 90.0 || f_fZ < -90.0 )
-			{
-				GetClientName(i, f_sName, sizeof(f_sName));	
+			{	
 				GetClientAuthString(i, f_sAuthID, sizeof(f_sAuthID));
 				GetClientIP(i, f_sIP, sizeof(f_sIP));
-				KAC_Log("%s (ID: %s | IP: %s) was banned for cheating with their eye angles.  Eye Angles: %f %f %f", f_sName, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
+				KAC_Log("%N (ID: %s | IP: %s) was banned for cheating with their eye angles.  Eye Angles: %f %f %f", client, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
 				KAC_Ban(i, 0, KAC_BANNED, "KAC: Eye Angles Violation");
 #if defined PRIVATE
-				Private_Ban(f_sAuthID, "%s (ID: %s | IP: %s) was banned for bad eye angles: %f %f %f.", f_sName, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
+				Private_Ban(f_sAuthID, "%N (ID: %s | IP: %s) was banned for bad eye angles: %f %f %f.", client, f_sAuthID, f_sIP, f_fX, f_vAngles[1], f_fZ);
 #endif
 			}
 		}

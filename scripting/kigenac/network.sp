@@ -93,10 +93,10 @@ public Action:Network_Checked(client, args)
 		}
 	}
 
-	new String:f_sName[64], String:f_sAuthID[64];
+	new String:f_sAuthID[64];
 	for(new i=1;i<=MaxClients;i++)
-		if ( g_bInGame[i] && GetClientName(i, f_sName, sizeof(f_sName)) && GetClientAuthString(i, f_sAuthID, sizeof(f_sAuthID)) )
-			ReplyToCommand(client, "%s (%s): %s", f_sName, f_sAuthID, (g_bChecked[i]) ? "Checked" : "Waiting");
+		if ( g_bInGame[i] && GetClientAuthString(i, f_sAuthID, sizeof(f_sAuthID)) )
+			ReplyToCommand(client, "%N (%s): %s", i, f_sAuthID, (g_bChecked[i]) ? "Checked" : "Waiting");
 
 	return Plugin_Handled;
 }
@@ -362,15 +362,14 @@ public Network_OnSocketReceive(Handle:socket, String:data[], const size, any:cli
 	if ( socket == INVALID_HANDLE || !g_bAuthorized[client] )
 		return;
 
-	decl String:f_sName[64], String:f_sAuthID[64], String:f_sBuffer[256];
-	GetClientName(client, f_sName, 64);
-	GetClientAuthString(client, f_sAuthID, 64);
 	g_bChecked[client] = true;
 	if ( StrEqual(data, "_BAN") )
 	{
+		decl String:f_sAuthID[64], String:f_sBuffer[256];
+		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 		KAC_Translate(client, KAC_GBANNED, f_sBuffer, sizeof(f_sBuffer));
 		SetTrieString(g_hDenyArray, f_sAuthID, f_sBuffer);
-		KAC_Log("%s (%s) is on the KAC global banlist.", f_sName, f_sAuthID);
+		KAC_Log("%N (%s) is on the KAC global banlist.", client, f_sAuthID);
 		KAC_Kick(client, KAC_GBANNED);
 	}
 	else if ( StrEqual(data, "_OK") )
@@ -379,8 +378,10 @@ public Network_OnSocketReceive(Handle:socket, String:data[], const size, any:cli
 	}
 	else
 	{
+		decl String:f_sAuthID[64];
+		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
 		g_bChecked[client] = false;
-		KAC_Log("%s (%s) got unknown reply from KAC master server. Data: %s", f_sName, f_sAuthID, data);
+		KAC_Log("%N (%s) got unknown reply from KAC master server. Data: %s", f_sAuthID, data);
 		Status_Report(g_iNetStatus, KAC_ERROR);
 	}
 	if ( SocketIsConnected(socket) )
