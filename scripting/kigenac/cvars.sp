@@ -812,7 +812,7 @@ public CVars_Replicate(Handle:convar, const String:oldvalue[], const String:newv
 		f_hTimer = GetArrayCell(f_hCVarIndex, CELL_CHANGED);
 		if ( f_hTimer != INVALID_HANDLE )
 			CloseHandle(f_hTimer);
-		f_hTimer = CreateTimer(0.5, CVars_ReplicateCheck, f_hCVarIndex);
+		f_hTimer = CreateTimer(30.0, CVars_ReplicateCheck, f_hCVarIndex);
 		SetArrayCell(f_hCVarIndex, CELL_CHANGED, f_hTimer);
 	}
 	// The delay is so that nothing interferes with the replication.
