@@ -180,7 +180,6 @@ public Network_OnSockConnVer(Handle:socket, any:we)
 	new String:buff[15];
 	Format(buff, sizeof(buff), "_UPDATE");
 	SocketSend(socket, buff, strlen(buff)+1); // Send that \0!
-	LogMessage("Connected to KAC Master, requesting update.");
 	Status_Report(g_iNetStatus, KAC_ON);
 	return;
 }
