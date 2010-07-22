@@ -222,7 +222,7 @@ public Action:CVars_CmdStatus(client, args)
 		if ( g_bInGame[i] )
 		{
 			GetClientAuthString(i, f_sAuth, sizeof(f_sAuth));
-			f_hTemp = g_hCurrentQuery[client];
+			f_hTemp = g_hCurrentQuery[i];
 			if ( f_hTemp == INVALID_HANDLE )
 			{
 				if ( g_hPeriodicTimer[i] == INVALID_HANDLE )
