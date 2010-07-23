@@ -94,6 +94,7 @@ CVars_OnPluginStart()
 	CVars_AddCVar("beetlesmod_version", 	COMP_NONEXIST,  ACTION_KICK, 	"0.0",  0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("est_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 	CVars_AddCVar("eventscripts_ver", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
+	CVars_AddCVar("fm_attackmode",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("lua_open",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("Lua-Engine",		COMP_NONEXIST, 	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("mani_admin_plugin_version", COMP_NONEXIST, ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
@@ -105,6 +106,7 @@ CVars_OnPluginStart()
 	CVars_AddCVar("runnscript",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("SmAdminTakeover", 	COMP_NONEXIST, 	ACTION_BAN,	"0.0", 	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("sourcemod_version", 	COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
+	CVars_AddCVar("tb_enabled",		COMP_NONEXIST,	ACTION_BAN,	"0.0",	0.0,	PRIORITY_HIGH);
 	CVars_AddCVar("zb_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 
 	//- Medium Priority -// Note: Now the client should be clean of any third party server side plugins.  Now we can start really checking.
