@@ -30,6 +30,12 @@
 #define KAC_REMCMDUSAGE "KAC_REMCMDUSAGE"
 #define KAC_REMCMDSUCCESS "KAC_REMCMDSUCCESS"
 #define KAC_REMCMDFAILURE "KAC_REMCMDFAILURE"
+#define KAC_ADDIGNCMDUSAGE "KAC_ADDIGNCMDUSAGE"
+#define KAC_ADDIGNCMDSUCCESS "KAC_ADDIGNCMDSUCCESS"
+#define KAC_ADDIGNCMDFAILURE "KAC_ADDIGNCMDFAILURE"
+#define KAC_REMIGNCMDUSAGE "KAC_REMIGNCMDUSAGE"
+#define KAC_REMIGNCMDSUCCESS "KAC_REMIGNCMDSUCCESS"
+#define KAC_REMIGNCMDFAILURE "KAC_REMIGNCMDFAILURE"
 #define KAC_FAILEDTOREPLY "KAC_FAILEDTOREPLY"
 #define KAC_FAILEDAUTH "KAC_FAILEDAUTH"
 #define KAC_CLIENTCORRUPT "KAC_CLIENTCORRUPT"
@@ -110,6 +116,12 @@ Trans_OnPluginStart()
 	SetTrieString(f_hTemp, KAC_REMCMDUSAGE, 	"Usage: kac_removecmd <command name>");
 	SetTrieString(f_hTemp, KAC_REMCMDSUCCESS, 	"You have successfully removed %s from the command block list.");
 	SetTrieString(f_hTemp, KAC_REMCMDFAILURE, 	"%s is not in the command block list.");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDUSAGE, 	"Usage: kac_addignorecmd <command name>");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDSUCCESS, 	"You have successfully added %s to the command ignore list.");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDFAILURE, 	"%s already exists in the command ignore list.");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDUSAGE, 	"Usage: kac_removeignorecmd <command name>");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDSUCCESS, 	"You have successfully removed %s from the command ignore list.");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDFAILURE, 	"%s is not in the command ignore list.");
 	SetTrieString(f_hTemp, KAC_FAILEDTOREPLY, 	"Your client has failed to reply to a query in time.  Please reconnect or restart your game");
 	SetTrieString(f_hTemp, KAC_FAILEDAUTH, 		"Your client has failed to authorize in time.  Please reconnect or restart your game");
 	SetTrieString(f_hTemp, KAC_CLIENTCORRUPT, 	"Your client has become corrupted.  Please restart your game before reconnecting");

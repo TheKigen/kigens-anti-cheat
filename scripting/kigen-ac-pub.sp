@@ -27,6 +27,8 @@
 #define GAME_TF2	2
 #define GAME_DOD	3
 #define GAME_INS	4
+#define GAME_L4D	5
+#define GAME_L4D2	6
 
 //- SM Includes -//
 #include <sourcemod>
@@ -42,6 +44,7 @@ new bool:g_bConnected[MAXPLAYERS+1] = {false, ...};	// I use these instead of th
 new bool:g_bAuthorized[MAXPLAYERS+1] = {false, ...};	// when I need to check on a client's state.  Natives are very taxing on
 new bool:g_bInGame[MAXPLAYERS+1] = {false, ...};	// system resources as compared to these. - Kigen
 new bool:g_bIsAdmin[MAXPLAYERS+1] = {false, ...};
+new bool:g_bIsFake[MAXPLAYERS+1] = {false, ...};
 new bool:g_bSourceBans = false;
 new bool:g_bMapStarted = false;
 new Handle:g_hCLang[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
@@ -100,6 +103,10 @@ public OnPluginStart()
 		g_iGame = GAME_TF2;
 	else if ( StrEqual(f_sGame, "insurgency") )
 		g_iGame = GAME_INS;
+	else if ( StrEqual(f_sGame, "left4dead") )
+		g_iGame = GAME_L4D;
+	else if ( StrEqual(f_sGame, "left4dead2") )
+		g_iGame = GAME_L4D2;
 
 
 //- Module Calls -//
@@ -217,7 +224,10 @@ public OnMapEnd()
 public bool:OnClientConnect(client, String:rejectmsg[], size)
 {
 	if ( IsFakeClient(client) ) // Bots suck.
+	{
+		g_bIsFake[client] = true;
 		return true;
+	}
 
 	g_bConnected[client] = true;
 	g_hCLang[client] = g_hSLang;
@@ -290,6 +300,7 @@ public OnClientDisconnect(client)
 	g_bAuthorized[client] = false;
 	g_bInGame[client] = false;
 	g_bIsAdmin[client] = false;
+	g_bIsFake[client] = false;
 	g_hCLang[client] = g_hSLang;
 	g_bShouldProcess[client] = false;
 	g_bHooked[client] = false;

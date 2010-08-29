@@ -20,6 +20,7 @@
 
 //- Global Variables -//
 new Handle:g_hBlockedCmds = INVALID_HANDLE;
+new Handle:g_hIgnoredCmds = INVALID_HANDLE;
 new bool:g_bCmdEnabled = true;
 new bool:g_bLogCmds = false;
 new g_iCmdSpam = 30;
@@ -92,6 +93,7 @@ Commands_OnAllPluginsLoaded()
 	decl Handle:f_hConCommand, String:f_sName[64], bool:f_bIsCommand, f_iFlags;
 
 	g_hBlockedCmds = CreateTrie();
+	g_hIgnoredCmds = CreateTrie();
 
 	// Exploitable needed commands.  Sigh....
 	RegConsoleCmd("ent_create", Commands_BlockEntExploit);
@@ -149,6 +151,17 @@ Commands_OnAllPluginsLoaded()
 	SetTrieValue(g_hBlockedCmds, "sv_soundscape_printdebuginfo", 	false);
 	SetTrieValue(g_hBlockedCmds, "wc_update_entity", 		false);
 
+	if ( g_iGame == GAME_L4D || g_iGame == GAME_L4D2 )
+	{
+		SetTrieValue(g_hIgnoredCmds, "choose_closedoor", 	true);
+		SetTrieValue(g_hIgnoredCmds, "choose_opendoor",		true);
+	}
+
+	SetTrieValue(g_hIgnoredCmds, "buy",				true);
+	SetTrieValue(g_hIgnoredCmds, "buyammo1",			true);
+	SetTrieValue(g_hIgnoredCmds, "buyammo2",			true);
+	SetTrieValue(g_hIgnoredCmds, "use",				true);
+
 	if ( g_bCmdEnabled )
 		g_hCountReset = CreateTimer(1.0, Commands_CountReset, _, TIMER_REPEAT);
 	else
@@ -165,17 +178,21 @@ Commands_OnAllPluginsLoaded()
 		{
 			if ( !f_bIsCommand || StrEqual(f_sName, "sm") )
 				continue;
-			if ( StrEqual(f_sName, "buy") || StrEqual(f_sName, "use") || ( StrContains(f_sName, "es_") != -1 && !StrEqual(f_sName, "es_version") ) )
+
+			if ( StrContains(f_sName, "es_") != -1 && !StrEqual(f_sName, "es_version") )
 				RegConsoleCmd(f_sName, Commands_ClientCheck);
 			else
 				RegConsoleCmd(f_sName, Commands_SpamCheck);
+
 		} while ( FindNextConCommand(f_hConCommand, f_sName, sizeof(f_sName), f_bIsCommand, f_iFlags));
 
 		CloseHandle(f_hConCommand);
 	}
 
-	RegAdminCmd("kac_addcmd", 	Commands_AddCmd, 	ADMFLAG_ROOT, 	"Adds a command to be blocked by KAC.");
-	RegAdminCmd("kac_removecmd", 	Commands_RemoveCmd, 	ADMFLAG_ROOT, 	"Removes a command from the block list.");
+	RegAdminCmd("kac_addcmd", 		Commands_AddCmd, 		ADMFLAG_ROOT, 	"Adds a command to be blocked by KAC.");
+	RegAdminCmd("kac_addignorecmd", 	Commands_AddIgnoreCmd,		ADMFLAG_ROOT,	"Adds a command to ignore on command spam.");
+	RegAdminCmd("kac_removecmd", 		Commands_RemoveCmd, 		ADMFLAG_ROOT, 	"Removes a command from the block list.");
+	RegAdminCmd("kac_removeignorecmd",	Commands_RemoveIgnoreCmd, 	ADMFLAG_ROOT, 	"Remove a command to ignore.");
 }
 
 Commands_OnPluginEnd()
@@ -269,6 +286,25 @@ public Action:Commands_AddCmd(client, args)
 	return Plugin_Handled;
 }
 
+public Action:Commands_AddIgnoreCmd(client, args)
+{
+	if ( args != 2 )
+	{
+		KAC_ReplyToCommand(client, KAC_ADDIGNCMDUSAGE);
+		return Plugin_Handled;
+	}
+
+	decl String:f_sCmdName[64];
+
+	GetCmdArg(1, f_sCmdName, sizeof(f_sCmdName));
+
+	if ( SetTrieValue(g_hIgnoredCmds, f_sCmdName, true) )
+		KAC_ReplyToCommand(client, KAC_ADDIGNCMDSUCCESS, f_sCmdName);
+	else
+		KAC_ReplyToCommand(client, KAC_ADDIGNCMDFAILURE, f_sCmdName);
+	return Plugin_Handled;
+}
+
 public Action:Commands_RemoveCmd(client, args)
 {
 	if ( args != 1 )
@@ -284,6 +320,24 @@ public Action:Commands_RemoveCmd(client, args)
 		KAC_ReplyToCommand(client, KAC_REMCMDSUCCESS, f_sCmdName);
 	else
 		KAC_ReplyToCommand(client, KAC_REMCMDFAILURE, f_sCmdName);
+	return Plugin_Handled;
+}
+
+public Action:Commands_RemoveIgnoreCmd(client, args)
+{
+	if ( args != 1 )
+	{
+		KAC_ReplyToCommand(client, KAC_REMIGNCMDUSAGE);
+		return Plugin_Handled;
+	}
+
+	decl String:f_sCmdName[64];
+	GetCmdArg(1, f_sCmdName, sizeof(f_sCmdName));
+
+	if ( RemoveFromTrie(g_hIgnoredCmds, f_sCmdName) )
+		KAC_ReplyToCommand(client, KAC_REMIGNCMDSUCCESS, f_sCmdName);
+	else
+		KAC_ReplyToCommand(client, KAC_REMIGNCMDFAILURE, f_sCmdName);
 	return Plugin_Handled;
 }
 
@@ -369,15 +423,20 @@ public Action:Commands_BlockEntExploit(client, args)
 
 public Action:Commands_CommandListener(client, const String:command[], argc)
 {
-	if ( !client || (IsClientConnected(client) && IsFakeClient(client) ) )
+	if ( !client || g_bIsFake[client] )
 		return Plugin_Continue;
 	if ( !g_bInGame[client] )
 		return Plugin_Stop;
 	if ( !g_bCmdEnabled )
 		return Plugin_Continue;
 
+	decl bool:f_bBan, String:f_sCmd[64];
+	
+	strcopy(f_sCmd, sizeof(f_sCmd),	command);
+	StringToLower(f_sCmd);
+
 	// Check to see if this person is command spamming.
-	if ( g_iCmdSpam != 0 && !StrEqual(command, "buy") && !StrEqual(command, "use") && !StrEqual(command, "buyammo1") && !StrEqual(command, "buyammo2") && ( StrContains(command, "es_") == -1 || StrEqual(command, "es_version") ) && g_iCmdCount[client]++ > g_iCmdSpam )
+	if ( g_iCmdSpam != 0 && !GetTrieValue(g_hIgnoredCmds, f_sCmd, f_bBan) && ( StrContains(f_sCmd, "es_") == -1 || StrEqual(f_sCmd, "es_version") ) && g_iCmdCount[client]++ > g_iCmdSpam )
 	{
 		decl String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
 		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
@@ -388,9 +447,7 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 		return Plugin_Stop;
 	}
 
-	decl bool:f_bBan;
-
-	if ( GetTrieValue(g_hBlockedCmds, command, f_bBan) )
+	if ( GetTrieValue(g_hBlockedCmds, f_sCmd, f_bBan) )
 	{
 		if ( f_bBan )
 		{
@@ -416,7 +473,7 @@ public Action:Commands_CommandListener(client, const String:command[], argc)
 
 public Action:Commands_ClientCheck(client, args)
 {
-	if ( !client || (IsClientConnected(client) && IsFakeClient(client) ) )
+	if ( !client || g_bIsFake[client] )
 		return Plugin_Continue;
 	if ( !g_bInGame[client] )
 		return Plugin_Stop;
@@ -453,7 +510,7 @@ public Action:Commands_ClientCheck(client, args)
 
 public Action:Commands_SpamCheck(client, args)
 {
-	if ( !client || (IsClientConnected(client) && IsFakeClient(client) ) )
+	if ( !client || g_bIsFake[client] )
 		return Plugin_Continue;
 	if ( !g_bInGame[client] )
 		return Plugin_Stop;
@@ -464,7 +521,7 @@ public Action:Commands_SpamCheck(client, args)
 	GetCmdArg(0, f_sCmd, sizeof(f_sCmd)); // This command's name.
 	StringToLower(f_sCmd);
 
-	if ( g_iCmdSpam != 0 && g_iCmdCount[client]++ > g_iCmdSpam )
+	if ( g_iCmdSpam != 0 && !GetTrieValue(g_hIgnoredCmds, f_sCmd, f_bBan) && g_iCmdCount[client]++ > g_iCmdSpam )
 	{
 		decl String:f_sAuthID[64], String:f_sIP[64], String:f_sCmdString[128];
 		GetClientAuthString(client, f_sAuthID, sizeof(f_sAuthID));
