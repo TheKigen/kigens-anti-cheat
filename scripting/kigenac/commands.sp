@@ -288,7 +288,7 @@ public Action:Commands_AddCmd(client, args)
 
 public Action:Commands_AddIgnoreCmd(client, args)
 {
-	if ( args != 2 )
+	if ( args != 1 )
 	{
 		KAC_ReplyToCommand(client, KAC_ADDIGNCMDUSAGE);
 		return Plugin_Handled;
