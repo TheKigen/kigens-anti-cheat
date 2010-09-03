@@ -30,18 +30,21 @@ new String:g_sBadPlugins[][] = {"sourceadmin.smx", "sourceadminother.smx", "s.sm
 
 RCON_OnPluginStart()
 {
-	g_hRCONCrash = FindConVar("kac_rcon_crashprevent");
-	if ( g_hRCONCrash == INVALID_HANDLE )
-		g_hRCONCrash = CreateConVar("kac_rcon_crashprevent", "0", "Enable RCON crash prevention.");
-	else
-		g_bRCONPreventEnabled = GetConVarBool(g_hRCONCrash);
+	if ( g_iGame != GAME_CSS && g_iGame != GAME_DOD && g_iGame != GAME_TF2 ) // VALVe finally fixed the crash in OB.  Disable for security so that brute forcing a password is worthless.
+	{
+		g_hRCONCrash = FindConVar("kac_rcon_crashprevent");
+		if ( g_hRCONCrash == INVALID_HANDLE )
+			g_hRCONCrash = CreateConVar("kac_rcon_crashprevent", "0", "Enable RCON crash prevention.");
+		else
+			g_bRCONPreventEnabled = GetConVarBool(g_hRCONCrash);
 
-	HookConVarChange(g_hRCONCrash, RCON_CrashPrevent);
+		HookConVarChange(g_hRCONCrash, RCON_CrashPrevent);
 
-	if ( g_bRCONPreventEnabled )
-		g_iRCONStatus = Status_Register(KAC_RCONPREVENT, KAC_ON);
-	else
-		g_iRCONStatus = Status_Register(KAC_RCONPREVENT, KAC_OFF);
+		if ( g_bRCONPreventEnabled )
+			g_iRCONStatus = Status_Register(KAC_RCONPREVENT, KAC_ON);
+		else
+			g_iRCONStatus = Status_Register(KAC_RCONPREVENT, KAC_OFF);
+	}
 
 	RCON_CheckBadPlugins();
 }
