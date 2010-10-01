@@ -30,7 +30,7 @@ new String:g_sBadPlugins[][] = {"sourceadmin.smx", "sourceadminother.smx", "s.sm
 
 RCON_OnPluginStart()
 {
-	if ( g_iGame != GAME_CSS && g_iGame != GAME_DOD && g_iGame != GAME_TF2 ) // VALVe finally fixed the crash in OB.  Disable for security so that brute forcing a password is worthless.
+	if ( g_iGame != GAME_CSS && g_iGame != GAME_DOD && g_iGame != GAME_TF2 && g_iGame != GAME_HL2DM ) // VALVe finally fixed the crash in OB.  Disable for security so that brute forcing a password is worthless.
 	{
 		g_hRCONCrash = FindConVar("kac_rcon_crashprevent");
 		if ( g_hRCONCrash == INVALID_HANDLE )
