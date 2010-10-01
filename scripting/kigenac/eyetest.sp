@@ -45,7 +45,7 @@ new g_iWeaponOwner[MAX_ENTITIES];
 
 Eyetest_OnPluginStart()
 {
-	if ( g_iGame != GAME_INS && g_iGame != GAME_CSS && g_iGame != GAME_L4D2 )
+	if ( g_iGame != GAME_INS && g_iGame != GAME_CSS && g_iGame != GAME_L4D2 && g_iGame != GAME_HL2DM )
 	{
 		g_hCVarEyeEnable = FindConVar("kac_eyes_enable");
 		if ( g_hCVarEyeEnable != INVALID_HANDLE )

@@ -19,7 +19,7 @@
 */
 
 //- Pre-processor Defines -//
-#define PLUGIN_VERSION "1.2.1.4"
+#define PLUGIN_VERSION "1.2.1.5"
 #define PLUGIN_BUILD 1
 
 #define GAME_OTHER	0
@@ -29,6 +29,7 @@
 #define GAME_INS	4
 #define GAME_L4D	5
 #define GAME_L4D2	6
+#define GAME_HL2DM	7
 
 //- SM Includes -//
 #include <sourcemod>
@@ -107,6 +108,8 @@ public OnPluginStart()
 		g_iGame = GAME_L4D;
 	else if ( StrEqual(f_sGame, "left4dead2") )
 		g_iGame = GAME_L4D2;
+	else if ( StrEqual(f_sGame, "hl2mp") )
+		g_iGame = GAME_HL2DM;
 
 
 //- Module Calls -//
