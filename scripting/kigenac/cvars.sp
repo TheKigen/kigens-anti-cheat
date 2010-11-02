@@ -62,12 +62,12 @@ new bool:g_bCVarsEnabled = true;
 new Handle:g_hCVarCVarsEnabled = INVALID_HANDLE;
 new Handle:g_hCVars = INVALID_HANDLE;
 new Handle:g_hCVarIndex = INVALID_HANDLE;
-new Handle:g_hCurrentQuery[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
-new Handle:g_hReplyTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
-new Handle:g_hPeriodicTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
+new Handle:g_hCurrentQuery[MAXCLIENTS] = {INVALID_HANDLE, ...};
+new Handle:g_hReplyTimer[MAXCLIENTS] = {INVALID_HANDLE, ...};
+new Handle:g_hPeriodicTimer[MAXCLIENTS] = {INVALID_HANDLE, ...};
 new String:g_sQueryResult[][] = {"Okay", "Not found", "Not valid", "Protected"};
-new g_iCurrentIndex[MAXPLAYERS+1] = {0, ...};
-new g_iRetryAttempts[MAXPLAYERS+1] = {0, ...};
+new g_iCurrentIndex[MAXCLIENTS] = {0, ...};
+new g_iRetryAttempts[MAXCLIENTS] = {0, ...};
 new g_iSize = 0;
 new g_iCVarsStatus;
 
@@ -77,11 +77,8 @@ CVars_OnPluginStart()
 {
 	decl Handle:f_hConCommand, String:f_sName[64], bool:f_bIsCommand, f_iFlags, Handle:f_hConVar;
 
-	g_hCVarCVarsEnabled = FindConVar("kac_cvars_enable");
-	if ( g_hCVarCVarsEnabled == INVALID_HANDLE )
-		g_hCVarCVarsEnabled = CreateConVar("kac_cvars_enable", "1", "Enable the CVar checks module.");
-	else
-		g_bCVarsEnabled = GetConVarBool(g_hCVarCVarsEnabled);
+	g_hCVarCVarsEnabled = CreateConVar("kac_cvars_enable", "1", "Enable the CVar checks module.");
+	g_bCVarsEnabled = GetConVarBool(g_hCVarCVarsEnabled);
 
 	HookConVarChange(g_hCVarCVarsEnabled, CVars_EnableChange);
 
@@ -110,7 +107,6 @@ CVars_OnPluginStart()
 	CVars_AddCVar("zb_version", 		COMP_NONEXIST, 	ACTION_KICK, 	"0.0", 	0.0, 	PRIORITY_HIGH);
 
 	//- Medium Priority -// Note: Now the client should be clean of any third party server side plugins.  Now we can start really checking.
-	CVars_AddCVar("sensitivity", 		COMP_LESS, 	ACTION_KICK, 	"100.0", 0.0, 	PRIORITY_MEDIUM);
 	CVars_AddCVar("sv_cheats", 		COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_MEDIUM);
 	CVars_AddCVar("sv_consistency", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_MEDIUM);
 	CVars_AddCVar("sv_gravity", 		COMP_EQUAL, 	ACTION_BAN, 	"800.0", 0.0, 	PRIORITY_MEDIUM);

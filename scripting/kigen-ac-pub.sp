@@ -19,7 +19,7 @@
 */
 
 //- Pre-processor Defines -//
-#define PLUGIN_VERSION "1.2.1.5"
+#define PLUGIN_VERSION "1.2.1.6"
 #define PLUGIN_BUILD 1
 
 #define GAME_OTHER	0
@@ -37,22 +37,25 @@
 #undef REQUIRE_EXTENSIONS
 #include <sdkhooks>
 
+#define MAXCLIENTS MAXPLAYERS+2
+
 //- Natives -//
 native SBBanPlayer(client, target, time, String:reason[]);
 
 //- Global Variables -//
-new bool:g_bConnected[MAXPLAYERS+1] = {false, ...};	// I use these instead of the natives because they are cheaper to call
-new bool:g_bAuthorized[MAXPLAYERS+1] = {false, ...};	// when I need to check on a client's state.  Natives are very taxing on
-new bool:g_bInGame[MAXPLAYERS+1] = {false, ...};	// system resources as compared to these. - Kigen
-new bool:g_bIsAdmin[MAXPLAYERS+1] = {false, ...};
-new bool:g_bIsFake[MAXPLAYERS+1] = {false, ...};
+new bool:g_bConnected[MAXCLIENTS] = {false, ...};	// I use these instead of the natives because they are cheaper to call
+new bool:g_bAuthorized[MAXCLIENTS] = {false, ...};	// when I need to check on a client's state.  Natives are very taxing on
+new bool:g_bInGame[MAXCLIENTS] = {false, ...};	// system resources as compared to these. - Kigen
+new bool:g_bIsAdmin[MAXCLIENTS] = {false, ...};
+new bool:g_bIsFake[MAXCLIENTS] = {false, ...};
 new bool:g_bSourceBans = false;
 new bool:g_bMapStarted = false;
-new Handle:g_hCLang[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
+new Handle:g_hCLang[MAXCLIENTS] = {INVALID_HANDLE, ...};
 new Handle:g_hSLang = INVALID_HANDLE;
-new Handle:g_hValidateTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
+new Handle:g_hValidateTimer[MAXCLIENTS] = {INVALID_HANDLE, ...};
 new Handle:g_hDenyArray = INVALID_HANDLE;
 new Handle:g_hClearTimer = INVALID_HANDLE;
+new Handle:g_hCVarVersion = INVALID_HANDLE;
 new g_iGame = GAME_OTHER; // Game identifier.
 
 //- KAC Modules -// Note: The ordering of these includes are imporant.
@@ -89,8 +92,6 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 public OnPluginStart()
 {
 	new String:f_sGame[64], String:f_sLang[8], Handle:f_hTemp;
-
-	SetConVarString(CreateConVar("kac_version", PLUGIN_VERSION, "KAC version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_CHEAT), PLUGIN_VERSION);
 
 	g_hDenyArray = CreateTrie();
 
@@ -137,6 +138,14 @@ public OnPluginStart()
 	f_hTemp = FindConVar("sv_max_usercmd_future_ticks");
 	if ( f_hTemp != INVALID_HANDLE )
 		SetConVarInt(f_hTemp, 1);
+
+	AutoExecConfig(true, "kigenac");
+
+	g_hCVarVersion = CreateConVar("kac_version", PLUGIN_VERSION, "KAC version", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_DONTRECORD);
+	// "plugin" - Cause we are a plugin.  "notify" - So that we appear on server tracking sites.  "dontrecord" - So that we don't get saved to the auto cfg.
+	SetConVarFlags(g_hCVarVersion, FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_DONTRECORD); // Make sure "dontrecord" is there so that AutoExecConfig won't auto generate kac_version into the cfg file.
+	SetConVarString(g_hCVarVersion, PLUGIN_VERSION);
+	HookConVarChange(g_hCVarVersion, VersionChange);
 
 	KAC_PrintToServer(KAC_LOADED);
 }
@@ -349,6 +358,14 @@ public Action:KAC_ValidateTimer(Handle:timer, any:client)
 public Action:KAC_ClearTimer(Handle:timer, any:nothing)
 {
 	ClearTrie(g_hDenyArray);
+}
+
+//- ConVar Hook -//
+
+public VersionChange(Handle:convar, const String:oldValue[], const String:newValue[])
+{
+	if ( !StrEqual(newValue, PLUGIN_VERSION) )
+		SetConVarString(g_hCVarVersion, PLUGIN_VERSION);
 }
 
 //- End of File -//

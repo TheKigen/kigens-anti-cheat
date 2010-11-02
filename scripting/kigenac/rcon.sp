@@ -32,11 +32,8 @@ RCON_OnPluginStart()
 {
 	if ( g_iGame != GAME_CSS && g_iGame != GAME_DOD && g_iGame != GAME_TF2 && g_iGame != GAME_HL2DM ) // VALVe finally fixed the crash in OB.  Disable for security so that brute forcing a password is worthless.
 	{
-		g_hRCONCrash = FindConVar("kac_rcon_crashprevent");
-		if ( g_hRCONCrash == INVALID_HANDLE )
-			g_hRCONCrash = CreateConVar("kac_rcon_crashprevent", "0", "Enable RCON crash prevention.");
-		else
-			g_bRCONPreventEnabled = GetConVarBool(g_hRCONCrash);
+		g_hRCONCrash = CreateConVar("kac_rcon_crashprevent", "0", "Enable RCON crash prevention.");
+		g_bRCONPreventEnabled = GetConVarBool(g_hRCONCrash);
 
 		HookConVarChange(g_hRCONCrash, RCON_CrashPrevent);
 

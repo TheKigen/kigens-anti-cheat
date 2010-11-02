@@ -98,7 +98,8 @@ Trans_OnPluginStart()
 
 	// Load languages into the adt_trie.
 	SetTrieValue(g_hLanguages, "en", any:CreateTrie());
-//	SetTrieValue(g_hLanguages, "nl", any:CreateTrie());
+	SetTrieValue(g_hLanguages, "fr", any:CreateTrie());
+	SetTrieValue(g_hLanguages, "it", any:CreateTrie());
 	
 	//- English -//
 	if ( !GetTrieValue(g_hLanguages, "en", any:f_hTemp) || f_hTemp == INVALID_HANDLE )
@@ -175,18 +176,155 @@ Trans_OnPluginStart()
 	SetTrieString(f_hTemp, KAC_FORCEDREVAL, 	"[KAC] Forced revalidation on all connected players.");
 	SetTrieString(f_hTemp, KAC_CANNOTREVAL, 	"[KAC] Cannot force revalidation until all player have already been validated.");
 
-	//- Dutch -//
-/*	if ( !GetTrieValue(g_hLanguages, "nl", any:f_hTemp) || f_hTemp == INVALID_HANDLE )
-		SetFailState("Unable to create language tree for Dutch");
+	//- French -//
+	// Thank you to vintage for this translation.  http://kigenac.com/memberlist.php?mode=viewprofile&u=1035
+	if ( !GetTrieValue(g_hLanguages, "fr", any:f_hTemp) || f_hTemp == INVALID_HANDLE )
+		SetFailState("Unable to create language tree for French");
+		
+	SetTrieString(f_hTemp, KAC_LOADED, "Kigen's Anti-Cheat est opérationnel.");
+	SetTrieString(f_hTemp, KAC_BANNED, "Vous avez été banni pour cheat détecté");
+	SetTrieString(f_hTemp, KAC_GBANNED, "Vous avez été banni de tous les serveurs protégés par Kigen's Anti-Cheat (KAC). Voir http://www.kigenac.com/ pour plus d'informations");
+	SetTrieString(f_hTemp, KAC_VACBANNED, "Ce serveur protégé par Kigen's Anti-Cheat (KAC) n'autorise pas les joueurs bannis par VALVe's Anti-Cheat (VAC)");
+	SetTrieString(f_hTemp, KAC_KCMDSPAM, "Vous avez été kické pour spam de commandes");
+	SetTrieString(f_hTemp, KAC_ADDCMDUSAGE, "Usage: kac_addcmd <nom de la commande> <ban (1 or 0)>");
+	SetTrieString(f_hTemp, KAC_ADDCMDSUCCESS, "Vous avez correctement ajouté %s à la liste des commandes à surveiller.");
+	SetTrieString(f_hTemp, KAC_ADDCMDFAILURE, "%s existe déjà dans la liste des commandes à surveiller.");
+	SetTrieString(f_hTemp, KAC_REMCMDUSAGE, "Usage: kac_removecmd <nom de la commande>");
+	SetTrieString(f_hTemp, KAC_REMCMDSUCCESS, "Vous avez correctement retiré %s de la liste des commandes à surveiller.");
+	SetTrieString(f_hTemp, KAC_REMCMDFAILURE, "%s n'est pas dans la liste des commandes à surveiller.");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDUSAGE, "Usage: kac_addignorecmd <nom de la commande>");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDSUCCESS, "Vous avez correctement ajouté %s à la liste des commandes à ignorer.");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDFAILURE, "%s existe déjà dans la liste des commandes à ignorer.");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDUSAGE, "Usage: kac_removeignorecmd <nom de la commande>");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDSUCCESS, "Vous avez correctement retiré %s de la liste des commandes à ignorer.");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDFAILURE, "%s n'est pas dans la liste des commandes à ignorer.");
+	SetTrieString(f_hTemp, KAC_FAILEDTOREPLY, "Votre client n'a pas répondu à temps à une requête. Veuillez vous reconnecter ou redémarrer votre jeu");
+	SetTrieString(f_hTemp, KAC_FAILEDAUTH, "Votre client n'a pas autorisé une requête. Veuillez vous reconnecter ou redémarrer votre jeu");
+	SetTrieString(f_hTemp, KAC_CLIENTCORRUPT, "Votre client a été corrompu. Veuillez redémarrer votre jeu avant de vous reconnecter");
+	SetTrieString(f_hTemp, KAC_REMOVEPLUGINS, "Veuillez supprimer les plugins tiers de votre client pour rejoindre ce serveur");
+	SetTrieString(f_hTemp, KAC_HASPLUGIN, "%N (%s) a un plugin activé, renvoie: %s.");
+	SetTrieString(f_hTemp, KAC_MUTED, "%N a été rendu silencieux par Kigen's Anti-Cheat.");
+	SetTrieString(f_hTemp, KAC_HASNOTEQUAL, "%N (%s) a renvoyé une mauvaise valeur pour %s (la valeur %s, devrait être %s).");
+	SetTrieString(f_hTemp, KAC_SHOULDEQUAL, "Votre cvar %s devrait être égale à %s mais est réglée à %s. Veuillez corriger! Merci");
+	SetTrieString(f_hTemp, KAC_HASNOTGREATER, "%N (%s) a la cvar %s réglée à %s alors qu'elle devrait être supérieure ou égale à %s.");
+	SetTrieString(f_hTemp, KAC_SHOULDGREATER, "Votre cvar %s devrait être supérieure ou égale à %s mais est réglée à %s. Veuillez corriger! Merci");
+	SetTrieString(f_hTemp, KAC_HASNOTLESS, "%N (%s) a la cvar %s réglée à %s alors qu'elle devrait être inférieure ou égale à %s.");
+	SetTrieString(f_hTemp, KAC_SHOULDLESS, "Votre cvar %s devrait être inférieure ou égale à %s mais est réglée à %s. Veuillez corriger! Merci");
+	SetTrieString(f_hTemp, KAC_HASNOTBOUND, "%N (%s) a la cvar %s réglée à %s walors qu'elle devrait être entre %s et %f.");
+	SetTrieString(f_hTemp, KAC_SHOULDBOUND, "Votre cvar %s devrait être entre %s et %f mais est réglée à %s. Veuillez corriger! Merci");
+	SetTrieString(f_hTemp, KAC_BANIP, "Vous avez été banni par le serveur");
+	SetTrieString(f_hTemp, KAC_ADDCVARUSAGE, "Usage: kac_addcvar <nom de la cvar> <type de comparaison> <action> <value> <valeur2 si encadrement>");
+	SetTrieString(f_hTemp, KAC_REMCVARUSAGE, "Usage: kac_removecvar <nom de la cvar>");
+	SetTrieString(f_hTemp, KAC_REMCVARSUCCESS, "La cvar %s a été retirée correctement de la liste de surveillance.");
+	SetTrieString(f_hTemp, KAC_REMCVARFAILED, "Impossible de trouver la cvar %s dans la liste de surveillance.");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADNAME, "Le nom de la cvar \"%s\" n'est pas valide et ne peut être utilisé.");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADCOMP, "Comparaison non reconnue \"%s\", valeurs acceptées: \"equal\", \"greater\", \"less\", \"between\", ou \"strequal\".");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADACT, "Action non reconnue \"%s\", valeurs acceptées: \"warn\", \"mute\", \"kick\", or \"ban\".");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADBOUND, "La comparaison d'encadrement nécessite deux valeurs pour être active.");
+	SetTrieString(f_hTemp, KAC_ADDCVAREXISTS, "La cvar %s existe déjà dans la liste de surveillance.");
+	SetTrieString(f_hTemp, KAC_ADDCVARSUCCESS, "La cvar %s a été correctement ajoutée à la liste de surveillance.");
+	SetTrieString(f_hTemp, KAC_ADDCVARFAILED, "La cvar %s n'a pu être ajoutée à la liste de surveillance.");
+	SetTrieString(f_hTemp, KAC_CHANGENAME, "Veuillez changer votre nom! SVP.");
+	SetTrieString(f_hTemp, KAC_CBANNED, "Vous avez été banni pour une violation d'usage de commande");
+	SetTrieString(f_hTemp, KAC_STATUSREPORT, "Rapport de Kigen's Anti-Cheat");
+	SetTrieString(f_hTemp, KAC_ON, "On");
+	SetTrieString(f_hTemp, KAC_OFF, "Off");
+	SetTrieString(f_hTemp, KAC_DISABLED, "Désactivé");
+	SetTrieString(f_hTemp, KAC_ERROR, "Erreur");
+	SetTrieString(f_hTemp, KAC_NOREPORT, "Il n'y a rien à noter dans le rapport.");
+	SetTrieString(f_hTemp, KAC_TRANSLATEMOD, "Traductions");
+	SetTrieString(f_hTemp, KAC_RCONPREVENT, "Prévention du crash RCON");
+	SetTrieString(f_hTemp, KAC_NETMOD, "Network");
+	SetTrieString(f_hTemp, KAC_UNABLETOCONTACT, "Impossible de contacter le server maître KAC");
+	SetTrieString(f_hTemp, KAC_EYEMOD, "Eye Test");
+	SetTrieString(f_hTemp, KAC_ANTIWH, "Anti-Wallhack");
+	SetTrieString(f_hTemp, KAC_NOSDKHOOK, "Désactivé; Impossible de trouver SDKHooks.ext");
+	SetTrieString(f_hTemp, KAC_CVARS, "Surveillance des CVars");
+	SetTrieString(f_hTemp, KAC_CMDMOD, "Protection des Commandes");
+	SetTrieString(f_hTemp, KAC_CMDSPAM, "Protection du spam de Commandes");
+	SetTrieString(f_hTemp, KAC_CLIENTMOD, "Module Client");
+	SetTrieString(f_hTemp, KAC_CLIENTBALANCE, "Client Team Auto-Balance");
+	SetTrieString(f_hTemp, KAC_CLIENTANTIRESPAWN, "Client Anti-Rejoindre");
+	SetTrieString(f_hTemp, KAC_CLIENTNAMEPROTECT, "Client Protection du Nom");
+	SetTrieString(f_hTemp, KAC_AUTOASSIGNED, "[KAC] Vous avez rejoint automatiquement une team.");
+	SetTrieString(f_hTemp, KAC_SAYBLOCK, "[KAC] Vous ne pouvez plus écrire dû à un caractère non autorisé.");
+	SetTrieString(f_hTemp, KAC_FORCEDREVAL, "[KAC] Revalidation forcée sur tous les joueurs connectés.");
+	SetTrieString(f_hTemp, KAC_CANNOTREVAL, "[KAC] Revalidation impossible, tous les joueurs ont déjà été validés.");
 
-	// Load the phrases into Translations.
-	SetTrieString(f_hTemp, KAC_LOADED, 		"Kigen's Anti-Cheat is succesvol geladen / opgestart.");
-	SetTrieString(f_hTemp, KAC_BANNED, 		"U ben verbannen voor een schending van de regels met betrekking tot valsspelen");
-	SetTrieString(f_hTemp, KAC_GBANNED, 		"You are banned from all Kigen's Anti-Cheat (KAC) protected servers.  See http://www.kigenac.com/ for more information");
-	SetTrieString(f_hTemp, KAC_VACBANNED, 		"This Kigen's Anti-Cheat (KAC) protected server does not allow VALVe's Anti-Cheat (VAC) banned players");
-	SetTrieString(f_hTemp, KAC_KCMDSPAM, 		"U ben verwijderd voor het herhalen van commando's");
-*/
-
+	//- Italian -//
+	// Thank you to asterix for this translation.  http://kigenac.com/memberlist.php?mode=viewprofile&u=116
+	if ( !GetTrieValue(g_hLanguages, "it", any:f_hTemp) || f_hTemp == INVALID_HANDLE )
+		SetFailState("Unable to create language tree for Italian");
+		
+	SetTrieString(f_hTemp, KAC_LOADED, "L'anticheats Kigen è stato caricato con successo.");
+	SetTrieString(f_hTemp, KAC_BANNED, "Sei stato bannato per aver utilizzato dei trucchi");
+	SetTrieString(f_hTemp, KAC_GBANNED, "Sei bannato da tutti i server protetti dall'anticheats Kigen (KAC). Visita http://www.kigenac.com/ per ulteriori informazioni");
+	SetTrieString(f_hTemp, KAC_VACBANNED, "I server protetti dall'anticheats Kigen (KAC) non permettono l'ingresso ai giocatori bannati dall'anticheats della VALVE (VAC)");
+	SetTrieString(f_hTemp, KAC_KCMDSPAM, "Se stato kikkato per spamming");
+	SetTrieString(f_hTemp, KAC_ADDCMDUSAGE, "Utilizzo: kac_addcmd <nome del comando> <ban (1 o 0)>");
+	SetTrieString(f_hTemp, KAC_ADDCMDSUCCESS, "Sei stato aggiunto %s alla lista dei blocchi comandi.");
+	SetTrieString(f_hTemp, KAC_ADDCMDFAILURE, "%s già esistente nella lista dei blocchi comandi.");
+	SetTrieString(f_hTemp, KAC_REMCMDUSAGE, "Utilizzo: kac_removecmd <nome del comando>");
+	SetTrieString(f_hTemp, KAC_REMCMDSUCCESS, "Sei stato rimosso %s dalla lista dei comandi.");
+	SetTrieString(f_hTemp, KAC_REMCMDFAILURE, "%s non è nella lista dei blocchi comandi.");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDUSAGE, "Utilizzo: kac_addignorecmd <nome del comando>");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDSUCCESS, "Seistato aggiunto %s alla lista ignora.");
+	SetTrieString(f_hTemp, KAC_ADDIGNCMDFAILURE, "%s esiste già nella lista ignora.");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDUSAGE, "Utilizzo: kac_removeignorecmd <nome del comando>");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDSUCCESS, "Sei stato rimosso %s dalla lista ignora.");
+	SetTrieString(f_hTemp, KAC_REMIGNCMDFAILURE, "%s non è trai comandi della lista ignora.");
+	SetTrieString(f_hTemp, KAC_FAILEDTOREPLY, "Il giocatore ha fallito nel rispondere in tempo a delle query. Per favore riconnetti o restarta il tuo gioco");
+	SetTrieString(f_hTemp, KAC_FAILEDAUTH, "Il giocatore non è riuscito ad ottenere l'autorizzazione in tempo.Per favore riconnetti o restarta il tuo gioco");
+	SetTrieString(f_hTemp, KAC_CLIENTCORRUPT, "Il giocatore sta per avere problemi di integrità. Per favore riconnetti o restarta il tuo gioco");
+	SetTrieString(f_hTemp, KAC_REMOVEPLUGINS, "Per favore rimuovi tutti i terzi programmi dal tuo pc prima di collegarti nuovamente a questo server");
+	SetTrieString(f_hTemp, KAC_HASPLUGIN, "%N (%s) ha un programma funzionante, risposta %s.");
+	SetTrieString(f_hTemp, KAC_MUTED, "%N è stato mutato dall'anticheats Kigen.");
+	SetTrieString(f_hTemp, KAC_HASNOTEQUAL, "%N (%s) non corretta risposta del valore %s (valore %s, deve essere %s).");
+	SetTrieString(f_hTemp, KAC_SHOULDEQUAL, "Il tuo valore %s deve essere uguale a %s invece è %s. Per favore modificalo prima di ricollegarti a questo server");
+	SetTrieString(f_hTemp, KAC_HASNOTGREATER, "%N (%s) ha il valore %s è %s quando deve essere maggiore o uguale a %s.");
+	SetTrieString(f_hTemp, KAC_SHOULDGREATER, "Il tuo valore %s deve essere maggiore o uguale a %s invece è %s. Per favore modificalo prima di ricollegarti");
+	SetTrieString(f_hTemp, KAC_HASNOTLESS, "%N (%s) ha il valore %s è %s quando deve essere inferiore o uguale a %s.");
+	SetTrieString(f_hTemp, KAC_SHOULDLESS, "Il tuo valore %s deve essere inferiore o uguale a %s invece è %s. Per favore modificalo prima di ricollegarti");
+	SetTrieString(f_hTemp, KAC_HASNOTBOUND, "%N (%s) ha il valore %s a %s quando deve essere tra %s e %f.");
+	SetTrieString(f_hTemp, KAC_SHOULDBOUND, "Il tuo valore %s deve essere tra %s e %f invece è %s. Per favore modificalo prima di ricollegarti");
+	SetTrieString(f_hTemp, KAC_BANIP, "Sei stato bannato dal server");
+	SetTrieString(f_hTemp, KAC_ADDCVARUSAGE, "Utilizzo: kac_addcvar <nome del cvar> <tipo del confronto> <azione> <valore> <valore2 se bindato>");
+	SetTrieString(f_hTemp, KAC_REMCVARUSAGE, "Usage: kac_removecvar <nome del cvar>");
+	SetTrieString(f_hTemp, KAC_REMCVARSUCCESS, "Il cvar %s è stato rmisso dalla lista di controllo");
+	SetTrieString(f_hTemp, KAC_REMCVARFAILED, "Impossibile trovare il cvar %s nella lista di controllo.");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADNAME, "Il nome di questo cvar \"%s\" non è valido e non può essere utilizzato.");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADCOMP, "Confronto non riconosciuto \"%s\", valore accettabile: \"uguale\", \"maggiore\", \"inferiore\", \"tra\", o \"strequal\".");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADACT, "Azione non riconosciuta \"%s\", valore accettabile: \"avvertimento\", \"mutare\", \"kick\", o \"bannare\".");
+	SetTrieString(f_hTemp, KAC_ADDCVARBADBOUND, "Il confronto bindato necessita di due valori da confrontare.");
+	SetTrieString(f_hTemp, KAC_ADDCVAREXISTS, "Il cvar %s esiste già nella lista di controllo.");
+	SetTrieString(f_hTemp, KAC_ADDCVARSUCCESS, "Il cvar %s è stato aggiunto alla lista di controllo.");
+	SetTrieString(f_hTemp, KAC_ADDCVARFAILED, "Non si è riusciti ad aggiungere il cvar %s alla lista di controllo.");
+	SetTrieString(f_hTemp, KAC_CHANGENAME, "Per favore cambia il tuo nome");
+	SetTrieString(f_hTemp, KAC_CBANNED, "Sei stato bannato per utilizzo proibito dei comandi");
+	SetTrieString(f_hTemp, KAC_STATUSREPORT, "Kigen's Anti-Cheat Status Report");
+	SetTrieString(f_hTemp, KAC_ON, "On");
+	SetTrieString(f_hTemp, KAC_OFF, "Off");
+	SetTrieString(f_hTemp, KAC_DISABLED, "Disabilitato");
+	SetTrieString(f_hTemp, KAC_ERROR, "Errore");
+	SetTrieString(f_hTemp, KAC_NOREPORT, "Non c'è nulla da riportare.");
+	SetTrieString(f_hTemp, KAC_TRANSLATEMOD, "Traduzioni");
+	SetTrieString(f_hTemp, KAC_RCONPREVENT, "RCON Prevenzione Crash");
+	SetTrieString(f_hTemp, KAC_NETMOD, "Rete");
+	SetTrieString(f_hTemp, KAC_UNABLETOCONTACT, "Impossibile contattare il KAC Master");
+	SetTrieString(f_hTemp, KAC_EYEMOD, "Test visivo");
+	SetTrieString(f_hTemp, KAC_ANTIWH, "Anti-Wallhack");
+	SetTrieString(f_hTemp, KAC_NOSDKHOOK, "Disabilitato; Impossibile trovare SDKHooks.ext");
+	SetTrieString(f_hTemp, KAC_CVARS, "CVars Controllo");
+	SetTrieString(f_hTemp, KAC_CMDMOD, "Command Protezione");
+	SetTrieString(f_hTemp, KAC_CMDSPAM, "Protezione Comando Spam");
+	SetTrieString(f_hTemp, KAC_CLIENTMOD, "Modulo Giocatore");
+	SetTrieString(f_hTemp, KAC_CLIENTBALANCE, "Auto-Balance team giocatori");
+	SetTrieString(f_hTemp, KAC_CLIENTANTIRESPAWN, "Giocatori Anti-Rejoin");
+	SetTrieString(f_hTemp, KAC_CLIENTNAMEPROTECT, "Protezione nomi giocatori");
+	SetTrieString(f_hTemp, KAC_AUTOASSIGNED, "[KAC] Sei stato assegnato forzatamente ad un Team.");
+	SetTrieString(f_hTemp, KAC_SAYBLOCK, "[KAC] Il tuo testo è stato bloccato a causa di alcuni caratteri non validi.");
+	SetTrieString(f_hTemp, KAC_FORCEDREVAL, "[KAC] Convalida forzata di tutti i giocatori connessi.");
+	SetTrieString(f_hTemp, KAC_CANNOTREVAL, "[KAC] Non si può forzare la validazione dei giocatori finchè questi non siano stati tutti validati");
 }
 
 stock KAC_Translate(client, String:trans[], String:dest[], maxlen)

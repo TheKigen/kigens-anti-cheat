@@ -29,12 +29,12 @@ new bool:g_bAntiWall = false;
 new Handle:g_hEyeTimer = INVALID_HANDLE;
 new Handle:g_hCVarEyeEnable = INVALID_HANDLE;
 new Handle:g_hCVarAntiWall = INVALID_HANDLE;
-new bool:g_bIsVisible[MAXPLAYERS+1][MAXPLAYERS+1];
-new bool:g_bShouldProcess[MAXPLAYERS+1];
-new bool:g_bHooked[MAXPLAYERS+1];
+new bool:g_bIsVisible[MAXCLIENTS][MAXCLIENTS];
+new bool:g_bShouldProcess[MAXCLIENTS];
+new bool:g_bHooked[MAXCLIENTS];
 new bool:g_bAntiWallDisabled = true;
-new Float:g_vClientPos[MAXPLAYERS+1][3];
-new Float:g_vClientEye[MAXPLAYERS+1][3];
+new Float:g_vClientPos[MAXCLIENTS][3];
+new Float:g_vClientEye[MAXCLIENTS][3];
 new g_iVelOff;
 new g_iBaseVelOff;
 new g_iEyeStatus;
@@ -47,20 +47,8 @@ Eyetest_OnPluginStart()
 {
 	if ( g_iGame != GAME_INS && g_iGame != GAME_CSS && g_iGame != GAME_L4D2 && g_iGame != GAME_HL2DM )
 	{
-		g_hCVarEyeEnable = FindConVar("kac_eyes_enable");
-		if ( g_hCVarEyeEnable != INVALID_HANDLE )
-			Eyetest_EnableChange(g_hCVarEyeEnable, "", "");
-		else if ( g_iGame != GAME_OTHER )
-		{
-			g_hCVarEyeEnable = CreateConVar("kac_eyes_enable", "1", "Enable the eye test detection routine.");
-			g_hEyeTimer = CreateTimer(0.5, Eyetest_Timer, _, TIMER_REPEAT);
-			g_bEyeEnabled = true;
-		}
-		else
-		{
-			g_hCVarEyeEnable = CreateConVar("kac_eyes_enable", "0", "Enable the eye test detection routine.");
-			g_bEyeEnabled = false;
-		}
+		g_hCVarEyeEnable = CreateConVar("kac_eyes_enable", "0", "Enable the eye test detection routine.");
+		Eyetest_EnableChange(g_hCVarEyeEnable, "", "");
 
 		if ( g_bEyeEnabled )
 			g_iEyeStatus = Status_Register(KAC_EYEMOD, KAC_ON);
@@ -77,9 +65,7 @@ Eyetest_OnPluginStart()
 		g_bAntiWallDisabled = false;
 		g_iAntiWHStatus = Status_Register(KAC_ANTIWH, KAC_OFF);
 
-		g_hCVarAntiWall = FindConVar("kac_eyes_antiwall");
-		if ( g_hCVarAntiWall == INVALID_HANDLE )
-			g_hCVarAntiWall = CreateConVar("kac_eyes_antiwall", "0", "Enable anti-wallhack");
+		g_hCVarAntiWall = CreateConVar("kac_eyes_antiwall", "0", "Enable anti-wallhack");
 
 		Eyetest_AntiWallChange(g_hCVarAntiWall, "", "");
 

@@ -24,7 +24,7 @@ new Handle:g_hIgnoredCmds = INVALID_HANDLE;
 new bool:g_bCmdEnabled = true;
 new bool:g_bLogCmds = false;
 new g_iCmdSpam = 30;
-new g_iCmdCount[MAXPLAYERS+2] = {0, ...};
+new g_iCmdCount[MAXCLIENTS] = {0, ...};
 new Handle:g_hCountReset = INVALID_HANDLE;
 new Handle:g_hCVarCmdEnable = INVALID_HANDLE;
 new Handle:g_hCVarCmdSpam = INVALID_HANDLE;
@@ -37,23 +37,14 @@ new g_iCmdSpamStatus;
 
 Commands_OnPluginStart()
 {
-	g_hCVarCmdEnable = FindConVar("kac_cmds_enable");
-	if ( g_hCVarCmdEnable == INVALID_HANDLE )
-		g_hCVarCmdEnable = CreateConVar("kac_cmds_enable", "1", "If the Commands Module of KAC is enabled.");
-	else
-		g_bCmdEnabled = GetConVarBool(g_hCVarCmdEnable);
+	g_hCVarCmdEnable = CreateConVar("kac_cmds_enable", "1", "If the Commands Module of KAC is enabled.");
+	g_bCmdEnabled = GetConVarBool(g_hCVarCmdEnable);
 
-	g_hCVarCmdSpam = FindConVar("kac_cmds_spam");
-	if ( g_hCVarCmdSpam == INVALID_HANDLE )
-		g_hCVarCmdSpam = CreateConVar("kac_cmds_spam", "30", "Amount of commands in one second before kick.  0 for disable.");
-	else
-		g_iCmdSpam = GetConVarInt(g_hCVarCmdSpam);
+	g_hCVarCmdSpam = CreateConVar("kac_cmds_spam", "30", "Amount of commands in one second before kick.  0 for disable.");
+	g_iCmdSpam = GetConVarInt(g_hCVarCmdSpam);
 
-	g_hCVarCmdLog = FindConVar("kac_cmds_log");
-	if ( g_hCVarCmdLog == INVALID_HANDLE )
-		g_hCVarCmdLog = CreateConVar("kac_cmds_log", "0", "Log command usage.  Use only for debugging purposes.");
-	else
-		g_bLogCmds = GetConVarBool(g_hCVarCmdLog);
+	g_hCVarCmdLog = CreateConVar("kac_cmds_log", "0", "Log command usage.  Use only for debugging purposes.");
+	g_bLogCmds = GetConVarBool(g_hCVarCmdLog);
 
 	HookConVarChange(g_hCVarCmdEnable, Commands_CmdEnableChange);
 	HookConVarChange(g_hCVarCmdSpam, Commands_CmdSpamChange);

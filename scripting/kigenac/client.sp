@@ -33,7 +33,7 @@ new g_iClientAntiRespawnStatus;
 new g_iClientNameProtectStatus;
 // new g_iClientAntiSpamConnectStatus;
 new Handle:g_hClientSpawned = INVALID_HANDLE;
-new g_iClientClass[MAXPLAYERS+1] = {-1, ...};
+new g_iClientClass[MAXCLIENTS] = {-1, ...};
 new String:g_sClientConnections[MAX_CONNECTIONS][64];
 new bool:g_bClientMapStarted = false;
 
@@ -41,19 +41,13 @@ new bool:g_bClientMapStarted = false;
 
 Client_OnPluginStart()
 {
-	g_hCVarClientEnable = FindConVar("kac_client_enable");
-	if ( g_hCVarClientEnable == INVALID_HANDLE )
-		g_hCVarClientEnable = CreateConVar("kac_client_enable", "1", "Enable the Client Protection module.");
-	else
-		g_bClientEnable = GetConVarBool(g_hCVarClientEnable);
+	g_hCVarClientEnable = CreateConVar("kac_client_enable", "1", "Enable the Client Protection module.");
+	g_bClientEnable = GetConVarBool(g_hCVarClientEnable);
 
 	if ( g_iGame == GAME_CSS )
 	{
-		g_hCVarClientAntiRespawn = FindConVar("kac_client_antirejoin");
-		if ( g_hCVarClientAntiRespawn == INVALID_HANDLE )
-			g_hCVarClientAntiRespawn = CreateConVar("kac_client_antirejoin", "0", "This will prevent people from leaving the game then rejoining to respawn.");
-		else
-			g_bClientAntiRespawn = GetConVarBool(g_hCVarClientAntiRespawn);
+		g_hCVarClientAntiRespawn = CreateConVar("kac_client_antirejoin", "0", "This will prevent people from leaving the game then rejoining to respawn.");
+		g_bClientAntiRespawn = GetConVarBool(g_hCVarClientAntiRespawn);
 
 		g_hClientSpawned = CreateTrie();
 
@@ -67,17 +61,11 @@ Client_OnPluginStart()
 		RegConsoleCmd("joinclass", Client_JoinClass);
 	}
 
-	g_hCVarClientNameProtect = FindConVar("kac_client_nameprotect");
-	if ( g_hCVarClientNameProtect == INVALID_HANDLE )
-		g_hCVarClientNameProtect = CreateConVar("kac_client_nameprotect", "1", "This will protect the server from name crashes and hacks.");
-	else
-		g_bClientNameProtect = GetConVarBool(g_hCVarClientNameProtect);
+	g_hCVarClientNameProtect = CreateConVar("kac_client_nameprotect", "1", "This will protect the server from name crashes and hacks.");
+	g_bClientNameProtect = GetConVarBool(g_hCVarClientNameProtect);
 
-	g_hCVarClientAntiSpamConnect = FindConVar("kac_client_antispamconnect");
-	if ( g_hCVarClientAntiSpamConnect == INVALID_HANDLE )
-		g_hCVarClientAntiSpamConnect = CreateConVar("kac_client_antispamconnect", "0", "Seconds to prevent someone from restablishing a connection. 0 to disable.");
-	else
-		g_fClientAntiSpamConnect = GetConVarFloat(g_hCVarClientAntiSpamConnect);
+	g_hCVarClientAntiSpamConnect = CreateConVar("kac_client_antispamconnect", "0", "Seconds to prevent someone from restablishing a connection. 0 to disable.");
+	g_fClientAntiSpamConnect = GetConVarFloat(g_hCVarClientAntiSpamConnect);
 
 	if ( g_bClientEnable )
 	{

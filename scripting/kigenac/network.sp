@@ -30,7 +30,7 @@ new bool:g_bVCheckDone = true;
 #else
 new bool:g_bVCheckDone = false;
 #endif
-new bool:g_bChecked[MAXPLAYERS+1] = {false, ...};
+new bool:g_bChecked[MAXCLIENTS] = {false, ...};
 new g_iInError = 0;
 new g_iNetStatus;
 new String:g_sMirrors[][] = { "kigenac.com", "nauc.info" };
