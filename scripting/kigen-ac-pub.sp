@@ -19,7 +19,7 @@
 */
 
 //- Pre-processor Defines -//
-#define PLUGIN_VERSION "1.2.1.6"
+#define PLUGIN_VERSION "1.2.1.7"
 #define PLUGIN_BUILD 1
 
 #define GAME_OTHER	0
@@ -37,22 +37,20 @@
 #undef REQUIRE_EXTENSIONS
 #include <sdkhooks>
 
-#define MAXCLIENTS MAXPLAYERS+2
-
 //- Natives -//
 native SBBanPlayer(client, target, time, String:reason[]);
 
 //- Global Variables -//
-new bool:g_bConnected[MAXCLIENTS] = {false, ...};	// I use these instead of the natives because they are cheaper to call
-new bool:g_bAuthorized[MAXCLIENTS] = {false, ...};	// when I need to check on a client's state.  Natives are very taxing on
-new bool:g_bInGame[MAXCLIENTS] = {false, ...};	// system resources as compared to these. - Kigen
-new bool:g_bIsAdmin[MAXCLIENTS] = {false, ...};
-new bool:g_bIsFake[MAXCLIENTS] = {false, ...};
+new bool:g_bConnected[MAXPLAYERS+1] = {false, ...};	// I use these instead of the natives because they are cheaper to call
+new bool:g_bAuthorized[MAXPLAYERS+1] = {false, ...};	// when I need to check on a client's state.  Natives are very taxing on
+new bool:g_bInGame[MAXPLAYERS+1] = {false, ...};	// system resources as compared to these. - Kigen
+new bool:g_bIsAdmin[MAXPLAYERS+1] = {false, ...};
+new bool:g_bIsFake[MAXPLAYERS+1] = {false, ...};
 new bool:g_bSourceBans = false;
 new bool:g_bMapStarted = false;
-new Handle:g_hCLang[MAXCLIENTS] = {INVALID_HANDLE, ...};
+new Handle:g_hCLang[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
 new Handle:g_hSLang = INVALID_HANDLE;
-new Handle:g_hValidateTimer[MAXCLIENTS] = {INVALID_HANDLE, ...};
+new Handle:g_hValidateTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
 new Handle:g_hDenyArray = INVALID_HANDLE;
 new Handle:g_hClearTimer = INVALID_HANDLE;
 new Handle:g_hCVarVersion = INVALID_HANDLE;

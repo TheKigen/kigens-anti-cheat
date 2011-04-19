@@ -62,12 +62,12 @@ new bool:g_bCVarsEnabled = true;
 new Handle:g_hCVarCVarsEnabled = INVALID_HANDLE;
 new Handle:g_hCVars = INVALID_HANDLE;
 new Handle:g_hCVarIndex = INVALID_HANDLE;
-new Handle:g_hCurrentQuery[MAXCLIENTS] = {INVALID_HANDLE, ...};
-new Handle:g_hReplyTimer[MAXCLIENTS] = {INVALID_HANDLE, ...};
-new Handle:g_hPeriodicTimer[MAXCLIENTS] = {INVALID_HANDLE, ...};
+new Handle:g_hCurrentQuery[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
+new Handle:g_hReplyTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
+new Handle:g_hPeriodicTimer[MAXPLAYERS+1] = {INVALID_HANDLE, ...};
 new String:g_sQueryResult[][] = {"Okay", "Not found", "Not valid", "Protected"};
-new g_iCurrentIndex[MAXCLIENTS] = {0, ...};
-new g_iRetryAttempts[MAXCLIENTS] = {0, ...};
+new g_iCurrentIndex[MAXPLAYERS+1] = {0, ...};
+new g_iRetryAttempts[MAXPLAYERS+1] = {0, ...};
 new g_iSize = 0;
 new g_iCVarsStatus;
 
@@ -936,7 +936,7 @@ CVars_CreateNewOrder()
 		f_iTemp = GetRandomInt(0, f_iHigh);
 		f_hOrder[f_iCurrent++] = GetArrayCell(f_hPHigh, f_iTemp);
 		RemoveFromArray(f_hPHigh, f_iTemp);
-		f_iHigh--; // We can be pretty certain its just one.
+		f_iHigh--;
 	}
 
 	while ( f_iMedium > -1 )
@@ -944,7 +944,7 @@ CVars_CreateNewOrder()
 		f_iTemp = GetRandomInt(0, f_iMedium);
 		f_hOrder[f_iCurrent++] = GetArrayCell(f_hPMedium, f_iTemp);
 		RemoveFromArray(f_hPMedium, f_iTemp);
-		f_iMedium--; // We can be pretty certain its just one.
+		f_iMedium--;
 	}
 
 	while ( f_iNormal > -1 )
@@ -952,7 +952,7 @@ CVars_CreateNewOrder()
 		f_iTemp = GetRandomInt(0, f_iNormal);
 		f_hOrder[f_iCurrent++] = GetArrayCell(f_hPNormal, f_iTemp);
 		RemoveFromArray(f_hPNormal, f_iTemp);
-		f_iNormal--; // We can be pretty certain its just one.
+		f_iNormal--;
 	}
 
 	ClearArray(g_hCVars);

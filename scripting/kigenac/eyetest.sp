@@ -29,12 +29,12 @@ new bool:g_bAntiWall = false;
 new Handle:g_hEyeTimer = INVALID_HANDLE;
 new Handle:g_hCVarEyeEnable = INVALID_HANDLE;
 new Handle:g_hCVarAntiWall = INVALID_HANDLE;
-new bool:g_bIsVisible[MAXCLIENTS][MAXCLIENTS];
-new bool:g_bShouldProcess[MAXCLIENTS];
-new bool:g_bHooked[MAXCLIENTS];
+new bool:g_bIsVisible[MAXPLAYERS+1][MAXPLAYERS+1];
+new bool:g_bShouldProcess[MAXPLAYERS+1];
+new bool:g_bHooked[MAXPLAYERS+1];
 new bool:g_bAntiWallDisabled = true;
-new Float:g_vClientPos[MAXCLIENTS][3];
-new Float:g_vClientEye[MAXCLIENTS][3];
+new Float:g_vClientPos[MAXPLAYERS+1][3];
+new Float:g_vClientEye[MAXPLAYERS+1][3];
 new g_iVelOff;
 new g_iBaseVelOff;
 new g_iEyeStatus;
@@ -170,7 +170,7 @@ public Eyetest_AntiWallChange(Handle:convar, const String:oldValue[], const Stri
 {
 	new bool:f_bEnabled = GetConVarBool(convar);
 
-	if ( GetExtensionFileStatus("sdkhooks.ext") != 1 )
+	if ( !LibraryExists("sdkhooks") )
 		Status_Report(g_iAntiWHStatus, KAC_NOSDKHOOK);
 
 	if ( f_bEnabled == g_bAntiWall )
@@ -178,7 +178,7 @@ public Eyetest_AntiWallChange(Handle:convar, const String:oldValue[], const Stri
 
 	if ( f_bEnabled )
 	{
-		if ( GetExtensionFileStatus("sdkhooks.ext") != 1 )
+		if ( !LibraryExists("sdkhooks") )
 		{
 			LogError("SDKHooks is not running.  Cannot enable Anti-Wall.");
 			SetConVarInt(convar, 0);

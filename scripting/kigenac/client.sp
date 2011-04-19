@@ -33,7 +33,7 @@ new g_iClientAntiRespawnStatus;
 new g_iClientNameProtectStatus;
 // new g_iClientAntiSpamConnectStatus;
 new Handle:g_hClientSpawned = INVALID_HANDLE;
-new g_iClientClass[MAXCLIENTS] = {-1, ...};
+new g_iClientClass[MAXPLAYERS+1] = {-1, ...};
 new String:g_sClientConnections[MAX_CONNECTIONS][64];
 new bool:g_bClientMapStarted = false;
 
