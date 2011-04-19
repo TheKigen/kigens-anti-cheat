@@ -2,7 +2,7 @@
 
 /*
     Kigen's Anti-Cheat
-    Copyright (C) 2007-2010 CodingDirect LLC
+    Copyright (C) 2007-2011 CodingDirect LLC
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
