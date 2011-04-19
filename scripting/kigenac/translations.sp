@@ -1,4 +1,4 @@
-﻿/*
+/*
     Kigen's Anti-Cheat Translations Module
     Copyright (C) 2007-2011 CodingDirect LLC
 
