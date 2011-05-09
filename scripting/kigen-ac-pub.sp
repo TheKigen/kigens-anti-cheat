@@ -19,7 +19,7 @@
 */
 
 //- Pre-processor Defines -//
-#define PLUGIN_VERSION "1.2.1.9"
+#define PLUGIN_VERSION "1.2.1.7"
 #define PLUGIN_BUILD 1
 
 #define GAME_OTHER	0
@@ -62,7 +62,6 @@ new g_iGame = GAME_OTHER; // Game identifier.
 #include "kigenac/commands.sp"		// Commands Module
 #include "kigenac/cvars.sp"		// CVar Module
 #include "kigenac/eyetest.sp"		// Eye Test Module
-#include "kigenac/hotfix.sp"		// Hotfix Module
 #include "kigenac/network.sp"		// Network Module
 #include "kigenac/rcon.sp"		// RCON Module
 #include "kigenac/status.sp"		// Status Module
@@ -85,7 +84,6 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 	MarkNativeAsOptional("SBBanPlayer");
 	MarkNativeAsOptional("SDKHook");
 	MarkNativeAsOptional("SDKUnhook");
-	CreateNative("KAC_ForcePlayerSuicide", Hotfix_ForceSuicide);
 	return APLRes_Success;
 }
 
@@ -122,7 +120,6 @@ public OnPluginStart()
 	Network_OnPluginStart();
 	RCON_OnPluginStart();
 	Trans_OnPluginStart();
-	Hotfix_OnPluginStart();
 #if defined PRIVATE
 	Private_OnPluginStart();
 #endif
