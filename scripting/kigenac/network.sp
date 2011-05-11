@@ -21,10 +21,16 @@
 // Old Network version, to be replaced soon.
 
 //- Global Variables -//
+new Handle:g_hCVarNetEnabled = INVALID_HANDLE;
+new Handle:g_hCVarNetUseBanlist = INVALID_HANDLE;
+new Handle:g_hCVarNetUseUpdate = INVALID_HANDLE;
 new Handle:g_hUpdateFile = INVALID_HANDLE;
 new Handle:g_hSocket = INVALID_HANDLE;
 new Handle:g_hTimer = INVALID_HANDLE;
 new Handle:g_hVTimer = INVALID_HANDLE;
+new bool:g_bCVarNetEnabled = true;
+new bool:g_bCVarNetUseBanlist = true;
+new bool:g_bCVarNetUseUpdate = true;
 #if defined PRIVATE
 new bool:g_bVCheckDone = true;
 #else
@@ -46,8 +52,26 @@ new String:UpdatePath[256];
 
 Network_OnPluginStart()
 {
+#if !defined PRIVATE
+	g_hCVarNetEnabled = CreateConVar("kac_net_enable", "1", "Enable the Network module.");
+	g_bCVarNetEnabled = GetConVarBool(g_hCVarNetEnabled);
+
+	g_hCVarNetUseBanlist = CreateConVar("kac_net_usebanlist", "1", "Use the global banlist.");
+	g_bCVarNetUseBanlist = GetConVarBool(g_hCVarNetUseBanlist);
+
+	g_hCVarNetUseUpdate = CreateConVar("kac_net_autoupdate", "1", "Use the Auto-Update feature.");
+	g_bCVarNetUseUpdate = GetConVarBool(g_hCVarNetUseUpdate);
+
+	HookConVarChange(g_hCVarNetEnabled, Network_ConVarChange);
+	HookConVarChange(g_hCVarNetUseBanlist, Network_ConVarChange);
+	HookConVarChange(g_hCVarNetUseUpdate, Network_ConVarChange);
+#endif
+
 	g_hTimer = CreateTimer(5.0, Network_Timer, _, TIMER_REPEAT);
-	g_iNetStatus = Status_Register(KAC_NETMOD, KAC_ON);
+	if ( g_bCVarNetEnabled )
+		g_iNetStatus = Status_Register(KAC_NETMOD, KAC_ON);
+	else
+		g_iNetStatus = Status_Register(KAC_NETMOD, KAC_OFF);
 
 	RegAdminCmd("kac_net_status", Network_Checked, ADMFLAG_GENERIC, "Reports who has been checked");
 }
@@ -69,10 +93,37 @@ Network_OnClientDisconnect(client)
 	g_bChecked[client] = false;
 }
 
+//- ConVar Functions -//
+
+public Network_ConVarChange(Handle:convar, const String:oldValue[], const String:newValue[])
+{
+	new bool:f_bNetEnabled = g_bCVarNetEnabled;
+
+	g_bCVarNetUseBanlist = GetConVarBool(g_hCVarNetUseBanlist);
+	g_bCVarNetUseUpdate = GetConVarBool(g_hCVarNetUseUpdate);
+
+	if ( !g_bCVarNetUseBanlist && !g_bCVarNetUseUpdate )
+		g_bCVarNetEnabled = false;
+	else
+		g_bCVarNetEnabled = GetConVarBool(g_hCVarNetEnabled);
+
+	if ( g_bCVarNetEnabled && !f_bNetEnabled )
+		Status_Report(g_iNetStatus, KAC_ON);
+	else if ( f_bNetEnabled )
+		Status_Report(g_iNetStatus, KAC_OFF);
+}
+
 //- Commands -//
 
 public Action:Network_Checked(client, args)
 {
+	if ( !g_bCVarNetEnabled || !g_bCVarNetUseBanlist )
+	{
+		// TODO: print error here
+		KAC_ReplyToCommand(client, KAC_DISABLED);
+		return Plugin_Handled;
+	}
+
 	if ( args )
 	{
 		new String:f_sArg[64];
@@ -119,13 +170,19 @@ public Action:Network_Timer(Handle:timer, any:we)
 		CloseHandle(f_hTemp);
 	}
 
-	if ( !g_bVCheckDone ) // If SourceMod is older than 1.3 we will not update.  But we will still check clients.
+	if ( !g_bCVarNetEnabled )
+		return Plugin_Continue;
+
+	if ( g_bCVarNetUseUpdate && !g_bVCheckDone ) // If SourceMod is older than 1.3 we will not update.  But we will still check clients.
 	{
 		g_iInError = 12; // Wait 30 seconds.
 		g_hSocket = SocketCreate(SOCKET_TCP, Network_OnSockErrVer);
 		SocketConnect(g_hSocket, Network_OnSockConnVer, Network_OnSockRecvVer, Network_OnSockDiscVer, "master.kigenac.com", 9652);
 		return Plugin_Continue;
 	}
+
+	if ( !g_bCVarNetUseBanlist )
+		return Plugin_Continue;
 
 	for(new i=1;i<=MaxClients;i++)
 	{
@@ -138,6 +195,7 @@ public Action:Network_Timer(Handle:timer, any:we)
 			return Plugin_Continue;
 		}
 	}
+
 	return Plugin_Continue;
 }
 
