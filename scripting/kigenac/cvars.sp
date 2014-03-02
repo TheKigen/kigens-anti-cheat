@@ -116,7 +116,6 @@ CVars_OnPluginStart()
 	CVars_AddCVar("cl_clock_correction", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("cl_leveloverview", 	COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("cl_overdraw_test", 	COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
-	CVars_AddCVar("cl_particles_show_bbox", COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("cl_phys_timescale", 	COMP_EQUAL, 	ACTION_BAN, 	"1.0", 	0.0, 	PRIORITY_NORMAL);
 	CVars_AddCVar("cl_showevents", 		COMP_EQUAL, 	ACTION_BAN, 	"0.0", 	0.0, 	PRIORITY_NORMAL);
 

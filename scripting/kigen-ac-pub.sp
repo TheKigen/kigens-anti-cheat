@@ -2,7 +2,7 @@
 
 /*
     Kigen's Anti-Cheat
-    Copyright (C) 2007-2011 CodingDirect LLC
+    Copyright (C) 2007-2014 CodingDirect LLC
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 */
 
 //- Pre-processor Defines -//
-#define PLUGIN_VERSION "1.2.2.0"
+#define PLUGIN_VERSION "1.2.2.1"
 #define PLUGIN_BUILD 1
 
 #define GAME_OTHER	0
