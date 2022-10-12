@@ -1,0 +1,3 @@
+# Kigen's Anti-Cheat
+
+This is an port of the Mercurial repository for Kigen's Anti-Cheat.  Since the original host machine for that repository has been offline for a number of years I figured on porting it to GitHub for archival purposes.  This project is not being worked on.  There are alternative SourceMod based anti-cheats available such as [Little Anti-Cheat](https://github.com/J-Tanzanite/Little-Anti-Cheat).  Kigen's Anti-Cheat 1.2.2.1 is the last official release.  While there was a 1.3.0 development being worked on it was never released publicly before the decision to halt development was made.
